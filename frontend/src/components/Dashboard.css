@@ -1,0 +1,104 @@
+.dashboard-bg {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #bb0000 0%, #666666 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dashboard-container {
+  background: #fff;
+  padding: 2.5rem 2rem;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+  min-width: 340px;
+  max-width: 420px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.osu-header {
+  color: #bb0000;
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 2rem;
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+.osu-logo {
+  width: 56px;
+  height: 56px;
+  display: block;
+  margin: -40px auto 1.2rem auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(187,0,0,0.10);
+  padding: 6px;
+}
+
+.category-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  width: 100%;
+}
+
+.category-card-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.category-card {
+  flex: 1;
+  display: block;
+  background: #bb0000;
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 600;
+  padding: 1.1rem 0;
+  border-radius: 10px;
+  text-align: center;
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgba(187,0,0,0.08);
+  transition: background 0.2s, color 0.2s, transform 0.2s;
+  border: 2px solid #bb0000;
+}
+
+.category-card:hover {
+  background: #fff;
+  color: #bb0000;
+  border: 2px solid #bb0000;
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 4px 16px rgba(187,0,0,0.15);
+}
+
+.delete-btn {
+  background: #fff;
+  border: 2px solid #dc2626;
+  color: #dc2626;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.delete-btn:hover {
+  background: #dc2626;
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(220,38,38,0.2);
+}
+
+.delete-btn svg {
+  width: 16px;
+  height: 16px;
+} 
