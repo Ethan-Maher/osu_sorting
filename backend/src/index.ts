@@ -7,7 +7,10 @@ const app = express();
 const prisma = new PrismaClient();
 const PORT = process.env.PORT || 4000;
 
-app.use(cors());
+app.use(cors({
+  origin: 'https://osu-sorting.vercel.app',
+  credentials: true,
+}));
 app.use(express.json());
 
 // Get all clothing items by categoryId, ordered
