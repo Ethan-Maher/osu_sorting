@@ -18,6 +18,11 @@ interface Item {
   id: string;
   name: string;
   categoryId: string;
+  brand: string;
+  size: string;
+  price: number;
+  color: string;
+  sku: string;
 }
 
 interface Category {
@@ -72,6 +77,11 @@ const ClothingList: React.FC = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: item.name,
+          brand: item.brand,
+          size: item.size,
+          price: item.price,
+          color: item.color,
+          sku: item.sku,
           categoryId,
         }),
       });
@@ -84,6 +94,11 @@ const ClothingList: React.FC = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: item.name,
+          brand: item.brand,
+          size: item.size,
+          price: item.price,
+          color: item.color,
+          sku: item.sku,
           categoryId,
         }),
       });
@@ -216,18 +231,33 @@ const ItemModal: React.FC<{
   initial?: Item | null;
 }> = ({ onClose, onSave, initial }) => {
   const [name, setName] = useState(initial?.name || '');
+  const [brand, setBrand] = useState(initial?.brand || '');
+  const [size, setSize] = useState(initial?.size || '');
+  const [price, setPrice] = useState(initial?.price?.toString() || '');
+  const [color, setColor] = useState(initial?.color || '');
+  const [sku, setSku] = useState(initial?.sku || '');
   const [error, setError] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    if (!name.trim()) {
-      setError('Item name is required');
+    if (!name.trim() || !brand.trim() || !size.trim() || !price.trim() || !color.trim() || !sku.trim()) {
+      setError('All fields are required');
+      return;
+    }
+    const priceNum = parseFloat(price);
+    if (isNaN(priceNum) || priceNum < 0) {
+      setError('Price must be a valid non-negative number');
       return;
     }
     onSave({
       id: initial?.id || Math.random().toString(36).substr(2, 9),
       name,
+      brand,
+      size,
+      price: priceNum,
+      color,
+      sku,
       categoryId: '', // will be set in parent
     });
   };
@@ -242,6 +272,27 @@ const ItemModal: React.FC<{
             <label>Name</label>
             <input value={name} onChange={e => setName(e.target.value)} required />
           </div>
+          <div className="form-group">
+            <label>Brand</label>
+            <input value={brand} onChange={e => setBrand(e.target.value)} required />
+          </div>
+          <div className="form-group">
+            <label>Size</label>
+            <input value={size} onChange={e => setSize(e.target.value)} required />
+          </div>
+          <div className="form-group">
+            <label>Price</label>
+            <input type="number" min="0" step="0.01" value={price} onChange={e => setPrice(e.target.value)} required />
+          </div>
+          <div className="form-group">
+            <label>Color</label>
+            <input value={color} onChange={e => setColor(e.target.value)} required />
+          </div>
+          <div className="form-group">
+            <label>SKU/Tag</label>
+            <input value={sku} onChange={e => setSku(e.target.value)} required />
+          </div>
+          {error && <div style={{ color: 'red', marginBottom: 8 }}>{error}</div>}
           <div style={{ marginTop: 16, display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
             <button type="button" className="osu-btn osu-btn-gray" onClick={onClose}>Cancel</button>
             <button type="submit" className="osu-btn">Save</button>
