@@ -1,7 +1,7 @@
 import express from 'express';
 import type { Request, Response } from 'express';
 import cors from 'cors';
-import { PrismaClient } from '../generated/prisma';
+import { PrismaClient } from '@prisma/client';
 
 const app = express();
 const prisma = new PrismaClient();
@@ -58,7 +58,7 @@ app.delete('/api/items/:id', async (req: Request, res: Response) => {
     where: { categoryId: deleted.categoryId },
     orderBy: { order: 'asc' },
   });
-  await Promise.all(items.map((item, idx) =>
+  await Promise.all(items.map((item: any, idx: number) =>
     prisma.clothingItem.update({ where: { id: item.id }, data: { order: idx + 1 } })
   ));
   res.json({ success: true });
