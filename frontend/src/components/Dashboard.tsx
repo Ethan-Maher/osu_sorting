@@ -3,8 +3,7 @@ import { Link } from 'react-router-dom';
 import { FaTrash } from 'react-icons/fa';
 import './Dashboard.css';
 import osuLogo from '../assets/osu.png';
-
-const API_URL = 'http://localhost:4000/api/categories';
+import { API_URLS } from '../config';
 
 interface Category {
   id: string;
@@ -23,7 +22,7 @@ const Dashboard: React.FC = () => {
   }, []);
 
   const fetchCategories = async () => {
-    const res = await fetch(API_URL);
+    const res = await fetch(API_URLS.categories);
     const data = await res.json();
     setCategories(data);
   };
@@ -36,7 +35,7 @@ const Dashboard: React.FC = () => {
       return;
     }
     try {
-      const res = await fetch(API_URL, {
+      const res = await fetch(API_URLS.categories, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: newCategory }),
@@ -64,7 +63,7 @@ const Dashboard: React.FC = () => {
       return;
     }
     try {
-      const res = await fetch(`${API_URL}/${id}`, {
+      const res = await fetch(`${API_URLS.categories}/${id}`, {
         method: 'DELETE',
       });
       if (res.ok) {
