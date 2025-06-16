@@ -149,7 +149,7 @@ const ClothingList: React.FC = () => {
 
   // Filtered items by SKU
   const filteredItems = items.filter(item =>
-    item.name.toLowerCase().includes(searchSku.toLowerCase())
+    item.sku.toLowerCase().includes(searchSku.toLowerCase())
   );
 
   return (
@@ -197,10 +197,10 @@ const ClothingList: React.FC = () => {
                 {filteredItems.map((item, idx) => (
                   <tr key={item.id}>
                     <td>{idx + 1}</td>
-                    <td>{item.name}</td>
+                    <td>{item.sku}</td>
                     <td>
                       <button className="osu-btn osu-btn-sm osu-btn-icon" title="Edit" onClick={() => { setEditItem(item); setShowModal(true); }}><FaEdit /></button>
-                      <button className="osu-btn osu-btn-sm osu-btn-icon osu-btn-gray" title="Remove" onClick={() => handleRemove(item.id, item.name)}><FaTrash /></button>
+                      <button className="osu-btn osu-btn-sm osu-btn-icon osu-btn-gray" title="Remove" onClick={() => handleRemove(item.id, item.sku)}><FaTrash /></button>
                       <button className="osu-btn osu-btn-sm osu-btn-icon osu-btn-gray" title="Move Up" onClick={() => moveItem(idx, -1)} disabled={idx === 0}><FaArrowUp /></button>
                       <button className="osu-btn osu-btn-sm osu-btn-icon osu-btn-gray" title="Move Down" onClick={() => moveItem(idx, 1)} disabled={idx === items.length - 1}><FaArrowDown /></button>
                     </td>
