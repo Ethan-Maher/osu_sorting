@@ -328,17 +328,24 @@
 }
 
 @media (max-width: 600px) {
-  .clothing-list-card {
-    padding: 1rem 0.2rem 1rem 0.2rem;
-    min-width: 0;
+  .clothing-list-bg {
+    width: 100%;
     max-width: 100vw;
-    border-radius: 0;
+    overflow-x: hidden;
   }
-  .clothing-table, .table-responsive {
-    width: 100vw;
+  .clothing-list-card {
+    width: 100%;
+    max-width: 100vw;
+    min-width: 0;
+    border-radius: 0;
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .table-responsive, .clothing-table {
+    width: 100%;
+    max-width: 100vw;
     min-width: 0;
     overflow-x: auto;
-    font-size: 0.98rem;
   }
   .clothing-table thead {
     display: none;
@@ -392,4 +399,8 @@
     font-size: 1.1rem;
     padding: 0.7rem 1.5rem;
   }
+}
+
+html, body {
+  overflow-x: hidden;
 } 
