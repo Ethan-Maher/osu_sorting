@@ -56,7 +56,7 @@ function App() {
         <Routes>
           <Route path="/login" element={<LoginWithAuth />} />
           <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-          <Route path="/clothing/:type" element={<PrivateRoute><ClothingList /></PrivateRoute>} />
+          <Route path="/clothing/:categoryId" element={<PrivateRoute><ClothingList /></PrivateRoute>} />
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
