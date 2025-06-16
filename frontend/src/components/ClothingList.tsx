@@ -29,6 +29,8 @@ const ClothingList: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [searchSku, setSearchSku] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<'sku' | 'brand' | 'size' | 'price' | 'color'>('sku');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const navigate = useNavigate();
 
   const fetchCategory = async () => {
@@ -139,8 +141,33 @@ const ClothingList: React.FC = () => {
     alert('Export to Excel coming soon!');
   };
 
+  // Sorting logic
+  const handleSort = (column: 'sku' | 'brand' | 'size' | 'price' | 'color') => {
+    if (sortBy === column) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(column);
+      setSortDirection('asc');
+    }
+  };
+
+  const sortedItems = [...items].sort((a, b) => {
+    let valA = a[sortBy];
+    let valB = b[sortBy];
+    if (sortBy === 'price') {
+      valA = Number(valA);
+      valB = Number(valB);
+    } else {
+      valA = (valA || '').toString().toLowerCase();
+      valB = (valB || '').toString().toLowerCase();
+    }
+    if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
+    if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
+    return 0;
+  });
+
   // Filtered items by SKU
-  const filteredItems = items.filter(item =>
+  const filteredItems = sortedItems.filter(item =>
     typeof item.sku === 'string' && item.sku.toLowerCase().includes(searchSku.toLowerCase())
   );
 
@@ -182,11 +209,21 @@ const ClothingList: React.FC = () => {
               <thead>
                 <tr>
                   <th>Position</th>
-                  <th>SKU</th>
-                  <th>Brand</th>
-                  <th>Size</th>
-                  <th>Price</th>
-                  <th>Color</th>
+                  <th style={{ cursor: 'pointer' }} onClick={() => handleSort('sku')}>
+                    SKU {sortBy === 'sku' && (sortDirection === 'asc' ? '▲' : '▼')}
+                  </th>
+                  <th style={{ cursor: 'pointer' }} onClick={() => handleSort('brand')}>
+                    Brand {sortBy === 'brand' && (sortDirection === 'asc' ? '▲' : '▼')}
+                  </th>
+                  <th style={{ cursor: 'pointer' }} onClick={() => handleSort('size')}>
+                    Size {sortBy === 'size' && (sortDirection === 'asc' ? '▲' : '▼')}
+                  </th>
+                  <th style={{ cursor: 'pointer' }} onClick={() => handleSort('price')}>
+                    Price {sortBy === 'price' && (sortDirection === 'asc' ? '▲' : '▼')}
+                  </th>
+                  <th style={{ cursor: 'pointer' }} onClick={() => handleSort('color')}>
+                    Color {sortBy === 'color' && (sortDirection === 'asc' ? '▲' : '▼')}
+                  </th>
                   <th>Actions</th>
                 </tr>
               </thead>
