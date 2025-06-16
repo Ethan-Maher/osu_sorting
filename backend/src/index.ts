@@ -25,17 +25,30 @@ app.get('/api/items/:categoryId', async (req: Request, res: Response) => {
 
 // Add a new clothing item
 app.post('/api/items', async (req: Request, res: Response) => {
-  const { categoryId, brand, size, price, color, sku } = req.body;
-  // Find current max order for this category
-  const maxOrder = await prisma.clothingItem.aggregate({
-    where: { categoryId },
-    _max: { order: true },
-  });
-  const order = (maxOrder._max?.order || 0) + 1;
-  const item = await prisma.clothingItem.create({
-    data: { categoryId, brand, size, price, color, sku, order },
-  });
-  res.json(item);
+  const { categoryId, brand, size, price, color, sku, name } = req.body;
+  // Validate all fields
+  if (
+    !categoryId || !brand || !size || price === undefined || !color || !sku || !name ||
+    typeof brand !== 'string' || typeof size !== 'string' ||
+    typeof color !== 'string' || typeof sku !== 'string' || typeof name !== 'string' ||
+    typeof price !== 'number' || isNaN(price)
+  ) {
+    return res.status(400).json({ error: 'All fields are required and must be valid.' });
+  }
+  try {
+    // Find current max order for this category
+    const maxOrder = await prisma.clothingItem.aggregate({
+      where: { categoryId },
+      _max: { order: true },
+    });
+    const order = (maxOrder._max?.order || 0) + 1;
+    const item = await prisma.clothingItem.create({
+      data: { categoryId, brand, size, price, color, sku, name, order },
+    });
+    res.json(item);
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to create item.' });
+  }
 });
 
 // Edit an item
