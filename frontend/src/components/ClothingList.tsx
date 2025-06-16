@@ -16,7 +16,6 @@ const priceToColor = (price: number) => {
 
 interface Item {
   id: string;
-  name: string;
   categoryId: string;
   brand: string;
   size: string;
@@ -70,17 +69,17 @@ const ClothingList: React.FC = () => {
 
   // Add or update item
   const handleSave = async (item: Item) => {
+    const itemWithColor = { ...item, color: priceToColor(item.price) };
     if (editItem) {
       // Edit
       const res = await fetch(`${API_URLS.items}/${item.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: item.name,
           brand: item.brand,
           size: item.size,
           price: item.price,
-          color: item.color,
+          color: itemWithColor.color,
           sku: item.sku,
           categoryId,
         }),
@@ -93,17 +92,16 @@ const ClothingList: React.FC = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: item.name,
           brand: item.brand,
           size: item.size,
           price: item.price,
-          color: item.color,
+          color: itemWithColor.color,
           sku: item.sku,
           categoryId,
         }),
       });
       const created = await res.json();
-      setItems(prev => [...prev, created].sort((a, b) => a.name.localeCompare(b.name)));
+      setItems(prev => [...prev, created].sort((a, b) => a.sku.localeCompare(b.sku)));
     }
     setShowModal(false);
     setEditItem(null);
@@ -230,18 +228,17 @@ const ItemModal: React.FC<{
   onSave: (item: Item) => void;
   initial?: Item | null;
 }> = ({ onClose, onSave, initial }) => {
-  const [name, setName] = useState(initial?.name || '');
   const [brand, setBrand] = useState(initial?.brand || '');
   const [size, setSize] = useState(initial?.size || '');
   const [price, setPrice] = useState(initial?.price?.toString() || '');
-  const [color, setColor] = useState(initial?.color || '');
   const [sku, setSku] = useState(initial?.sku || '');
   const [error, setError] = useState('');
+  const color = priceToColor(parseFloat(price) || 0);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    if (!name.trim() || !brand.trim() || !size.trim() || !price.trim() || !color.trim() || !sku.trim()) {
+    if (!brand.trim() || !size.trim() || !price.trim() || !sku.trim()) {
       setError('All fields are required');
       return;
     }
@@ -252,7 +249,6 @@ const ItemModal: React.FC<{
     }
     onSave({
       id: initial?.id || Math.random().toString(36).substr(2, 9),
-      name,
       brand,
       size,
       price: priceNum,
@@ -269,10 +265,6 @@ const ItemModal: React.FC<{
         <h3>{initial ? 'Edit' : 'Add'} Clothing Item</h3>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Name</label>
-            <input value={name} onChange={e => setName(e.target.value)} required />
-          </div>
-          <div className="form-group">
             <label>Brand</label>
             <input value={brand} onChange={e => setBrand(e.target.value)} required />
           </div>
@@ -283,10 +275,9 @@ const ItemModal: React.FC<{
           <div className="form-group">
             <label>Price</label>
             <input type="number" min="0" step="0.01" value={price} onChange={e => setPrice(e.target.value)} required />
-          </div>
-          <div className="form-group">
-            <label>Color</label>
-            <input value={color} onChange={e => setColor(e.target.value)} required />
+            <div style={{ marginTop: 4, fontSize: '0.95em', color: color }}>
+              Color: <span className={`pill-badge pill-${color}`}>{color}</span>
+            </div>
           </div>
           <div className="form-group">
             <label>SKU/Tag</label>

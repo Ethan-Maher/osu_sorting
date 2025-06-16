@@ -25,15 +25,24 @@ app.get('/api/items/:categoryId', async (req: Request, res: Response) => {
 
 // Add a new clothing item
 app.post('/api/items', async (req: Request, res: Response) => {
-  const { categoryId, brand, size, price, color, sku, name } = req.body;
+  const { categoryId, brand, size, price, color, sku } = req.body;
   // Validate all fields
   if (
-    !categoryId || !brand || !size || price === undefined || !color || !sku || !name ||
+    !categoryId || !brand || !size || price === undefined || !sku ||
     typeof brand !== 'string' || typeof size !== 'string' ||
-    typeof color !== 'string' || typeof sku !== 'string' || typeof name !== 'string' ||
+    typeof sku !== 'string' ||
     typeof price !== 'number' || isNaN(price)
   ) {
     return res.status(400).json({ error: 'All fields are required and must be valid.' });
+  }
+  // Set color based on price
+  let itemColor = color;
+  if (!itemColor) {
+    if (price < 5) itemColor = 'gray';
+    else if (price < 10) itemColor = 'green';
+    else if (price < 20) itemColor = 'blue';
+    else if (price < 50) itemColor = 'orange';
+    else itemColor = 'red';
   }
   try {
     // Find current max order for this category
@@ -43,7 +52,7 @@ app.post('/api/items', async (req: Request, res: Response) => {
     });
     const order = (maxOrder._max?.order || 0) + 1;
     const item = await prisma.clothingItem.create({
-      data: { categoryId, brand, size, price, color, sku, name, order },
+      data: { categoryId, brand, size, price, color: itemColor, sku, order },
     });
     res.json(item);
   } catch (e) {
@@ -55,11 +64,32 @@ app.post('/api/items', async (req: Request, res: Response) => {
 app.put('/api/items/:id', async (req: Request, res: Response) => {
   const { id } = req.params;
   const { brand, size, price, color, sku } = req.body;
-  const item = await prisma.clothingItem.update({
-    where: { id },
-    data: { brand, size, price, color, sku },
-  });
-  res.json(item);
+  if (
+    !brand || !size || price === undefined || !sku ||
+    typeof brand !== 'string' || typeof size !== 'string' ||
+    typeof sku !== 'string' ||
+    typeof price !== 'number' || isNaN(price)
+  ) {
+    return res.status(400).json({ error: 'All fields are required and must be valid.' });
+  }
+  // Set color based on price
+  let itemColor = color;
+  if (!itemColor) {
+    if (price < 5) itemColor = 'gray';
+    else if (price < 10) itemColor = 'green';
+    else if (price < 20) itemColor = 'blue';
+    else if (price < 50) itemColor = 'orange';
+    else itemColor = 'red';
+  }
+  try {
+    const item = await prisma.clothingItem.update({
+      where: { id },
+      data: { brand, size, price, color: itemColor, sku },
+    });
+    res.json(item);
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to update item.' });
+  }
 });
 
 // Delete an item and re-order remaining
