@@ -16,16 +16,20 @@ app.use(express.json());
 // Get all clothing items by categoryId, ordered
 app.get('/api/items/:categoryId', async (req: Request, res: Response) => {
   const { categoryId } = req.params;
-  const items = await prisma.clothingItem.findMany({
-    where: { categoryId },
-    orderBy: { order: 'asc' },
-  });
-  res.json(items);
+  try {
+    const items = await prisma.clothingItem.findMany({
+      where: { categoryId },
+      orderBy: { order: 'asc' },
+    });
+    res.json(items);
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to fetch items' });
+  }
 });
 
 // Add a new clothing item
 app.post('/api/items', async (req: Request, res: Response) => {
-  const { categoryId, brand, size, price, color, sku } = req.body;
+  const { categoryId, brand, size, price, sku } = req.body;
   // Validate all fields
   if (
     !categoryId || !brand || !size || price === undefined || !sku ||
@@ -36,14 +40,13 @@ app.post('/api/items', async (req: Request, res: Response) => {
     return res.status(400).json({ error: 'All fields are required and must be valid.' });
   }
   // Set color based on price
-  let itemColor = color;
-  if (!itemColor) {
-    if (price < 5) itemColor = 'gray';
-    else if (price < 10) itemColor = 'green';
-    else if (price < 20) itemColor = 'blue';
-    else if (price < 50) itemColor = 'orange';
-    else itemColor = 'red';
-  }
+  let itemColor = '';
+  if (price < 5) itemColor = 'gray';
+  else if (price < 10) itemColor = 'green';
+  else if (price < 20) itemColor = 'blue';
+  else if (price < 50) itemColor = 'orange';
+  else itemColor = 'red';
+
   try {
     // Find current max order for this category
     const maxOrder = await prisma.clothingItem.aggregate({
@@ -63,7 +66,7 @@ app.post('/api/items', async (req: Request, res: Response) => {
 // Edit an item
 app.put('/api/items/:id', async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { brand, size, price, color, sku } = req.body;
+  const { brand, size, price, sku } = req.body;
   if (
     !brand || !size || price === undefined || !sku ||
     typeof brand !== 'string' || typeof size !== 'string' ||
@@ -73,14 +76,13 @@ app.put('/api/items/:id', async (req: Request, res: Response) => {
     return res.status(400).json({ error: 'All fields are required and must be valid.' });
   }
   // Set color based on price
-  let itemColor = color;
-  if (!itemColor) {
-    if (price < 5) itemColor = 'gray';
-    else if (price < 10) itemColor = 'green';
-    else if (price < 20) itemColor = 'blue';
-    else if (price < 50) itemColor = 'orange';
-    else itemColor = 'red';
-  }
+  let itemColor = '';
+  if (price < 5) itemColor = 'gray';
+  else if (price < 10) itemColor = 'green';
+  else if (price < 20) itemColor = 'blue';
+  else if (price < 50) itemColor = 'orange';
+  else itemColor = 'red';
+
   try {
     const item = await prisma.clothingItem.update({
       where: { id },
@@ -95,32 +97,44 @@ app.put('/api/items/:id', async (req: Request, res: Response) => {
 // Delete an item and re-order remaining
 app.delete('/api/items/:id', async (req: Request, res: Response) => {
   const { id } = req.params;
-  const deleted = await prisma.clothingItem.delete({ where: { id } });
-  // Reorder remaining items of this category
-  const items = await prisma.clothingItem.findMany({
-    where: { categoryId: deleted.categoryId },
-    orderBy: { order: 'asc' },
-  });
-  await Promise.all(items.map((item: any, idx: number) =>
-    prisma.clothingItem.update({ where: { id: item.id }, data: { order: idx + 1 } })
-  ));
-  res.json({ success: true });
+  try {
+    const deleted = await prisma.clothingItem.delete({ where: { id } });
+    // Reorder remaining items of this category
+    const items = await prisma.clothingItem.findMany({
+      where: { categoryId: deleted.categoryId },
+      orderBy: { order: 'asc' },
+    });
+    await Promise.all(items.map((item: { id: string }, idx: number) =>
+      prisma.clothingItem.update({ where: { id: item.id }, data: { order: idx + 1 } })
+    ));
+    res.json({ success: true });
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to delete item.' });
+  }
 });
 
 // Reorder items (accepts array of ids in new order)
 app.post('/api/items/:categoryId/reorder', async (req: Request, res: Response) => {
   const { categoryId } = req.params;
   const { ids } = req.body; // array of item ids in new order
-  await Promise.all(ids.map((id: string, idx: number) =>
-    prisma.clothingItem.update({ where: { id }, data: { order: idx + 1 } })
-  ));
-  res.json({ success: true });
+  try {
+    await Promise.all(ids.map((id: string, idx: number) =>
+      prisma.clothingItem.update({ where: { id }, data: { order: idx + 1 } })
+    ));
+    res.json({ success: true });
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to reorder items.' });
+  }
 });
 
 // Category endpoints
 app.get('/api/categories', async (req: Request, res: Response) => {
-  const categories = await prisma.category.findMany({ orderBy: { name: 'asc' } });
-  res.json(categories);
+  try {
+    const categories = await prisma.category.findMany({ orderBy: { name: 'asc' } });
+    res.json(categories);
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to fetch categories.' });
+  }
 });
 
 app.post('/api/categories', async (req: Request, res: Response) => {

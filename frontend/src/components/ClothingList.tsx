@@ -5,15 +5,6 @@ import { FaArrowLeft, FaEdit, FaTrash, FaArrowUp, FaArrowDown, FaPlus, FaFileExp
 import './ClothingList.css';
 import { API_URLS } from '../config';
 
-// Helper: price to color mapping
-const priceToColor = (price: number) => {
-  if (price < 5) return 'gray';
-  if (price < 10) return 'green';
-  if (price < 20) return 'blue';
-  if (price < 50) return 'orange';
-  return 'red';
-};
-
 interface Item {
   id: string;
   categoryId: string;
@@ -35,41 +26,42 @@ const ClothingList: React.FC = () => {
   const [items, setItems] = useState<Item[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [editItem, setEditItem] = useState<Item | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [searchSku, setSearchSku] = useState('');
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (categoryId) {
-      fetchCategory();
-      fetchItems();
-    }
-  }, [categoryId]);
 
   const fetchCategory = async () => {
     try {
       const res = await fetch(`${API_URLS.categories}/${categoryId}`);
+      if (!res.ok) throw new Error('Failed to fetch category');
       const data = await res.json();
       setCategory(data);
-    } catch (err) {
-      setError('Error fetching category');
+    } catch (e) {
+      setError('Failed to load category');
     }
   };
 
   const fetchItems = async () => {
     try {
-      const res = await fetch(`${API_URLS.items}?categoryId=${categoryId}`);
+      const res = await fetch(`${API_URLS.items}/${categoryId}`);
+      if (!res.ok) throw new Error('Failed to fetch items');
       const data = await res.json();
       setItems(data);
-    } catch (err) {
-      setError('Error fetching items');
+    } catch (e) {
+      setError('Failed to load items');
+    } finally {
+      setLoading(false);
     }
   };
 
+  useEffect(() => {
+    fetchCategory();
+    fetchItems();
+  }, [categoryId]);
+
   // Add or update item
   const handleSave = async (item: Item) => {
-    const itemWithColor = { ...item, color: priceToColor(item.price) };
     if (editItem) {
       // Edit
       const res = await fetch(`${API_URLS.items}/${item.id}`, {
@@ -79,15 +71,15 @@ const ClothingList: React.FC = () => {
           brand: item.brand,
           size: item.size,
           price: item.price,
-          color: itemWithColor.color,
           sku: item.sku,
           categoryId,
         }),
       });
-      const updated = await res.json();
-      setItems(prev => prev.map(i => (i.id === updated.id ? updated : i)));
+      if (!res.ok) throw new Error('Failed to update item');
+      const updatedItem = await res.json();
+      setItems(items.map(i => i.id === updatedItem.id ? updatedItem : i));
     } else {
-      // Add
+      // Add new
       const res = await fetch(API_URLS.items, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -95,13 +87,13 @@ const ClothingList: React.FC = () => {
           brand: item.brand,
           size: item.size,
           price: item.price,
-          color: itemWithColor.color,
           sku: item.sku,
           categoryId,
         }),
       });
-      const created = await res.json();
-      setItems(prev => [...prev, created].sort((a, b) => a.sku.localeCompare(b.sku)));
+      if (!res.ok) throw new Error('Failed to create item');
+      const newItem = await res.json();
+      setItems([...items, newItem]);
     }
     setShowModal(false);
     setEditItem(null);
@@ -149,7 +141,7 @@ const ClothingList: React.FC = () => {
 
   // Filtered items by SKU
   const filteredItems = items.filter(item =>
-    item.sku.toLowerCase().includes(searchSku.toLowerCase())
+    typeof item.sku === 'string' && item.sku.toLowerCase().includes(searchSku.toLowerCase())
   );
 
   return (
@@ -233,7 +225,6 @@ const ItemModal: React.FC<{
   const [price, setPrice] = useState(initial?.price?.toString() || '');
   const [sku, setSku] = useState(initial?.sku || '');
   const [error, setError] = useState('');
-  const color = priceToColor(parseFloat(price) || 0);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -252,7 +243,7 @@ const ItemModal: React.FC<{
       brand,
       size,
       price: priceNum,
-      color,
+      color: '', // color is now handled by the backend
       sku,
       categoryId: '', // will be set in parent
     });
@@ -275,9 +266,6 @@ const ItemModal: React.FC<{
           <div className="form-group">
             <label>Price</label>
             <input type="number" min="0" step="0.01" value={price} onChange={e => setPrice(e.target.value)} required />
-            <div style={{ marginTop: 4, fontSize: '0.95em', color: color }}>
-              Color: <span className={`pill-badge pill-${color}`}>{color}</span>
-            </div>
           </div>
           <div className="form-group">
             <label>SKU/Tag</label>
