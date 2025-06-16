@@ -95,24 +95,25 @@
   border-collapse: separate;
   border-spacing: 0;
   margin-top: 1rem;
-  background: #f9fafb;
-  border-radius: 14px;
+  background: rgba(249,250,251,0.98);
+  border-radius: 18px;
   overflow: hidden;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-  font-size: 1.05rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+  font-size: 1.07rem;
 }
 .clothing-table th, .clothing-table td {
   padding: 0.85rem 0.7rem;
   text-align: left;
 }
 .clothing-table th {
-  background: #bb0000;
+  background: linear-gradient(90deg, #bb0000 60%, #f59e42 100%);
   color: #fff;
   font-weight: 800;
   border-bottom: 2px solid #bb0000;
   position: sticky;
   top: 0;
   z-index: 1;
+  letter-spacing: 0.5px;
 }
 .clothing-table tr:nth-child(even) {
   background: #f3f4f6;
@@ -122,6 +123,7 @@
 }
 .clothing-table td {
   border-bottom: 1px solid #e5e7eb;
+  background: rgba(255,255,255,0.92);
 }
 .clothing-table tr:last-child td {
   border-bottom: none;
@@ -160,29 +162,35 @@
 .modal-bg {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.18);
+  background: rgba(30, 30, 40, 0.22);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
   padding: 2vh 0;
+  animation: modal-fade-in 0.25s cubic-bezier(0.4,0,0.2,1);
+}
+@keyframes modal-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 .modal-card {
-  background: rgba(255,255,255,0.92);
-  backdrop-filter: blur(10px) saturate(1.2);
-  padding: 2.2rem 2rem 1.7rem 2rem;
-  border-radius: 22px;
-  box-shadow: 0 12px 40px rgba(0,0,0,0.22);
-  min-width: 280px;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(16px) saturate(1.5);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.22), 0 1.5px 8px rgba(187,0,0,0.10);
+  border-radius: 24px;
+  border: 1.5px solid #e5e7eb;
+  padding: 2.2rem 1.5rem 1.7rem 1.5rem;
+  min-width: 0;
   max-width: 400px;
-  width: 100%;
+  width: 95vw;
   max-height: 90vh;
   overflow-y: auto;
   position: relative;
-  border: 1.5px solid #e5e7eb;
   display: flex;
   flex-direction: column;
   align-items: stretch;
+  animation: modal-fade-in 0.25s cubic-bezier(0.4,0,0.2,1);
 }
 .modal-card h3 {
   color: #bb0000;
@@ -221,20 +229,35 @@
   font-size: 1.05rem;
 }
 .form-group input {
-  padding: 0.6rem 0.9rem;
+  padding: 0.7rem 1.1rem;
   border: 1.5px solid #c7d2fe;
-  border-radius: 8px;
-  font-size: 1.05rem;
+  border-radius: 12px;
+  font-size: 1.08rem;
   outline: none;
-  transition: border 0.2s;
-  background: #f9fafb;
+  background: rgba(249,250,251,0.95);
   color: #222;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  transition: border 0.2s, box-shadow 0.2s;
 }
 .form-group input:focus {
   border: 1.5px solid #bb0000;
+  box-shadow: 0 2px 8px rgba(187,0,0,0.10);
 }
 .modal-card .osu-btn {
-  margin-top: 0.2rem;
+  background: linear-gradient(90deg, #bb0000 60%, #f59e42 100%);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.08rem;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(187,0,0,0.10);
+  padding: 0.8rem 1.5rem;
+  margin-top: 0.5rem;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.modal-card .osu-btn:hover {
+  background: linear-gradient(90deg, #800000 60%, #f59e42 100%);
+  box-shadow: 0 4px 16px rgba(187,0,0,0.13);
 }
 @media (max-width: 900px) {
   .modal-card {
@@ -401,17 +424,8 @@
     max-width: 400px;
     box-sizing: border-box;
     margin: 0 auto;
-    border-radius: 0;
-    padding: 1.5rem 1rem;
-    max-height: 90vh;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    border-radius: 18px;
+    padding: 1.2rem 0.7rem 1.2rem 0.7rem;
   }
   .modal-card h3 {
     font-size: 1.4rem;
@@ -478,6 +492,10 @@
   .clothing-list-actions .osu-btn svg {
     margin-right: 8px;
   }
+}
+
+body.modal-open {
+  overflow: hidden !important;
 }
 
 html, body {
