@@ -144,6 +144,10 @@ const ClothingList: React.FC = () => {
     typeof item.sku === 'string' && item.sku.toLowerCase().includes(searchSku.toLowerCase())
   );
 
+  if (!categoryId) {
+    return <div style={{ color: 'red', margin: 32 }}>Invalid category. Please go back and select a category.</div>;
+  }
+
   return (
     <div className="clothing-list-bg">
       <div className="clothing-list-card glass">
@@ -178,7 +182,11 @@ const ClothingList: React.FC = () => {
               <thead>
                 <tr>
                   <th>Position</th>
-                  <th>Name</th>
+                  <th>SKU</th>
+                  <th>Brand</th>
+                  <th>Size</th>
+                  <th>Price</th>
+                  <th>Color</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -190,6 +198,10 @@ const ClothingList: React.FC = () => {
                   <tr key={item.id}>
                     <td>{idx + 1}</td>
                     <td>{item.sku}</td>
+                    <td>{item.brand}</td>
+                    <td>{item.size}</td>
+                    <td>${item.price.toFixed(2)}</td>
+                    <td><span className={`pill-badge pill-${item.color}`}>{item.color}</span></td>
                     <td>
                       <button className="osu-btn osu-btn-sm osu-btn-icon" title="Edit" onClick={() => { setEditItem(item); setShowModal(true); }}><FaEdit /></button>
                       <button className="osu-btn osu-btn-sm osu-btn-icon osu-btn-gray" title="Remove" onClick={() => handleRemove(item.id, item.sku)}><FaTrash /></button>
