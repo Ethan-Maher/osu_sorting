@@ -233,13 +233,13 @@ const ClothingList: React.FC = () => {
                 )}
                 {filteredItems.map((item, idx) => (
                   <tr key={item.id}>
-                    <td>{idx + 1}</td>
-                    <td>{item.sku}</td>
-                    <td>{item.brand}</td>
-                    <td>{item.size}</td>
-                    <td>${item.price.toFixed(2)}</td>
-                    <td><span className={`pill-badge pill-${item.color}`}>{item.color}</span></td>
-                    <td>
+                    <td data-label="Position">{idx + 1}</td>
+                    <td data-label="SKU">{item.sku}</td>
+                    <td data-label="Brand">{item.brand}</td>
+                    <td data-label="Size">{item.size}</td>
+                    <td data-label="Price">${item.price.toFixed(2)}</td>
+                    <td data-label="Color"><span className={`pill-badge pill-${item.color}`}>{item.color}</span></td>
+                    <td data-label="Actions">
                       <button className="osu-btn osu-btn-sm osu-btn-icon" title="Edit" onClick={() => { setEditItem(item); setShowModal(true); }}><FaEdit /></button>
                       <button className="osu-btn osu-btn-sm osu-btn-icon osu-btn-gray" title="Remove" onClick={() => handleRemove(item.id, item.sku)}><FaTrash /></button>
                       <button className="osu-btn osu-btn-sm osu-btn-icon osu-btn-gray" title="Move Up" onClick={() => moveItem(idx, -1)} disabled={idx === 0}><FaArrowUp /></button>
@@ -345,4 +345,4 @@ const ItemModal: React.FC<{
   );
 };
 
-export default ClothingList; 
+export default ClothingList;
