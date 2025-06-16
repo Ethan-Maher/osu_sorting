@@ -226,6 +226,15 @@ const ClothingList: React.FC = () => {
   );
 };
 
+// Helper: price to color mapping
+const priceToColor = (price: number) => {
+  if (price < 5) return 'gray';
+  if (price < 10) return 'green';
+  if (price < 20) return 'blue';
+  if (price < 50) return 'orange';
+  return 'red';
+};
+
 // Modal for add/edit item
 const ItemModal: React.FC<{
   onClose: () => void;
@@ -237,6 +246,8 @@ const ItemModal: React.FC<{
   const [price, setPrice] = useState(initial?.price?.toString() || '');
   const [sku, setSku] = useState(initial?.sku || '');
   const [error, setError] = useState('');
+
+  const color = priceToColor(parseFloat(price) || 0);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -278,6 +289,9 @@ const ItemModal: React.FC<{
           <div className="form-group">
             <label>Price</label>
             <input type="number" min="0" step="0.01" value={price} onChange={e => setPrice(e.target.value)} required />
+            <div style={{ marginTop: 4, fontSize: '0.95em', color: color }}>
+              Color: <span className={`pill-badge pill-${color}`}>{color}</span>
+            </div>
           </div>
           <div className="form-group">
             <label>SKU/Tag</label>
