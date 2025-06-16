@@ -199,14 +199,7 @@ const ClothingList: React.FC = () => {
             />
           </div>
           <button onClick={() => setShowModal(true)} className="osu-btn"><FaPlus style={{marginRight: 6}} />Add Item</button>
-          <button
-            className="osu-btn osu-btn-gray"
-            style={{ marginLeft: 8 }}
-            disabled
-            title="Coming soon!"
-          >
-            Export to Excel
-          </button>
+          <button onClick={handleExport} className="osu-btn osu-btn-gray"><FaFileExport style={{marginRight: 6}} />Export</button>
         </div>
         {loading ? (
           <div style={{ marginTop: 24 }}>Loading...</div>
