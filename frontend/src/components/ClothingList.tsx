@@ -62,17 +62,6 @@ const ClothingList: React.FC = () => {
     fetchItems();
   }, [categoryId]);
 
-  useEffect(() => {
-    if (showModal) {
-      document.body.classList.add('modal-open');
-    } else {
-      document.body.classList.remove('modal-open');
-    }
-    return () => {
-      document.body.classList.remove('modal-open');
-    };
-  }, [showModal]);
-
   // Add or update item
   const handleSave = async (item: Item) => {
     if (editItem) {
@@ -187,7 +176,7 @@ const ClothingList: React.FC = () => {
   }
 
   return (
-    <div className="clothing-list-bg" style={{ minHeight: '100vh', overflowY: loading || items.length === 0 ? 'hidden' : 'auto' }}>
+    <div className="clothing-list-bg">
       <div className="clothing-list-card glass">
         <button className="back-btn" onClick={() => navigate('/dashboard')}><FaArrowLeft /> Back</button>
         <img src={osuLogo} alt="Ohio State Logo" className="osu-logo" />

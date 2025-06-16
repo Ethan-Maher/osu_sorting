@@ -37,43 +37,6 @@
   }
 }
 
-body {
-  min-height: 100vh;
-  margin: 0;
-  font-family: 'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif;
-  background: linear-gradient(135deg, #bb0000 0%, #f59e42 100%);
-  color: #222;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
-}
-
-#root {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
 html, body {
-  width: 100%;
-  box-sizing: border-box;
   overflow-x: hidden;
-}
-
-::-webkit-scrollbar {
-  width: 8px;
-  background: #f3f4f6;
-}
-::-webkit-scrollbar-thumb {
-  background: #bb0000;
-  border-radius: 8px;
-}
-
-/* Add a subtle fade-in for all pages */
-.fade-in {
-  animation: fadeIn 0.5s cubic-bezier(0.4,0,0.2,1);
-}
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
 }
