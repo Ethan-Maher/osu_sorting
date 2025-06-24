@@ -278,6 +278,15 @@
 .pill-blue { background: #2563eb; }
 .pill-orange { background: #f59e42; }
 .pill-red { background: #bb0000; }
+.pill-lime { background: #a3e635; }
+.pill-teal { background: #14b8a6; }
+.pill-yellow { background: #fde047; color: #222; }
+.pill-indigo { background: #6366f1; }
+.pill-violet { background: #a78bfa; }
+.pill-pink { background: #ec4899; }
+.pill-royal\ blue { background: #4169e1; }
+.pill-light\ blue { background: #38bdf8; }
+.pill-peach { background: #ffbfae; color: #222; }
 
 .osu-btn-icon {
   padding: 0.3rem 0.5rem;

@@ -55,7 +55,7 @@ app.post('/api/items', async (req: Request, res: Response) => {
     15: 'Peach',
     20: 'teal',
   };
-  let itemColor = colorChart[price] || '';
+  let itemColor = colorChart[price] || 'gray';
 
   try {
     // Find current max order for this category
@@ -101,7 +101,7 @@ app.put('/api/items/:id', async (req: Request, res: Response) => {
     15: 'Peach',
     20: 'teal',
   };
-  let itemColor = colorChart[price] || '';
+  let itemColor = colorChart[price] || 'gray';
 
   try {
     const item = await prisma.clothingItem.update({
