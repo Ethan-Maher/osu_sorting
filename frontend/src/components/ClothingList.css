@@ -287,6 +287,9 @@
 .pill-royal\ blue { background: #4169e1; }
 .pill-light\ blue { background: #38bdf8; }
 .pill-peach { background: #ffbfae; color: #222; }
+.pill-lime, .pill-teal, .pill-indigo, .pill-violet, .pill-pink, .pill-royal\ blue, .pill-light\ blue, .pill-red, .pill-orange, .pill-green, .pill-blue, .pill-gray {
+  color: #fff;
+}
 
 .osu-btn-icon {
   padding: 0.3rem 0.5rem;
