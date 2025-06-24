@@ -263,13 +263,21 @@ const ClothingList: React.FC = () => {
   );
 };
 
-// Helper: price to color mapping
-const priceToColor = (price: number) => {
-  if (price < 5) return 'gray';
-  if (price < 10) return 'green';
-  if (price < 20) return 'blue';
-  if (price < 50) return 'orange';
-  return 'red';
+// Remove priceToColor and use backend color chart for preview
+const colorChart: { [key: number]: string } = {
+  9: 'Red',
+  4: 'Orange',
+  10: 'Yellow',
+  6: 'Green',
+  7: 'Blue',
+  5: 'Indigo',
+  8: 'Violet',
+  3: 'Pink',
+  11: 'royal blue',
+  12: 'light blue',
+  2: 'lime',
+  15: 'Peach',
+  20: 'teal',
 };
 
 // Modal for add/edit item
@@ -284,7 +292,7 @@ const ItemModal: React.FC<{
   const [sku, setSku] = useState(initial?.sku || '');
   const [error, setError] = useState('');
 
-  const color = priceToColor(parseFloat(price) || 0);
+  const color = colorChart[Math.round(parseFloat(price))] || 'gray';
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
