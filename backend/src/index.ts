@@ -39,13 +39,23 @@ app.post('/api/items', async (req: Request, res: Response) => {
   ) {
     return res.status(400).json({ error: 'All fields are required and must be valid.' });
   }
-  // Set color based on price
-  let itemColor = '';
-  if (price < 5) itemColor = 'gray';
-  else if (price < 10) itemColor = 'green';
-  else if (price < 20) itemColor = 'blue';
-  else if (price < 50) itemColor = 'orange';
-  else itemColor = 'red';
+  // Set color based on price (using color chart)
+  const colorChart: { [key: number]: string } = {
+    9: 'Red',
+    4: 'Orange',
+    10: 'Yellow',
+    6: 'Green',
+    7: 'Blue',
+    5: 'Indigo',
+    8: 'Violet',
+    3: 'Pink',
+    11: 'royal blue',
+    12: 'light blue',
+    2: 'lime',
+    15: 'Peach',
+    20: 'teal',
+  };
+  let itemColor = colorChart[price] || '';
 
   try {
     // Find current max order for this category
@@ -75,13 +85,23 @@ app.put('/api/items/:id', async (req: Request, res: Response) => {
   ) {
     return res.status(400).json({ error: 'All fields are required and must be valid.' });
   }
-  // Set color based on price
-  let itemColor = '';
-  if (price < 5) itemColor = 'gray';
-  else if (price < 10) itemColor = 'green';
-  else if (price < 20) itemColor = 'blue';
-  else if (price < 50) itemColor = 'orange';
-  else itemColor = 'red';
+  // Set color based on price (using color chart)
+  const colorChart: { [key: number]: string } = {
+    9: 'Red',
+    4: 'Orange',
+    10: 'Yellow',
+    6: 'Green',
+    7: 'Blue',
+    5: 'Indigo',
+    8: 'Violet',
+    3: 'Pink',
+    11: 'royal blue',
+    12: 'light blue',
+    2: 'lime',
+    15: 'Peach',
+    20: 'teal',
+  };
+  let itemColor = colorChart[price] || '';
 
   try {
     const item = await prisma.clothingItem.update({
