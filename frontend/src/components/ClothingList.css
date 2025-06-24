@@ -145,7 +145,7 @@
   box-shadow: 0 4px 16px rgba(187,0,0,0.13);
 }
 .osu-btn-gray {
-  background: #666666;
+  background: #6b7280;
   color: #fff;
 }
 .osu-btn-gray:hover {
@@ -273,19 +273,19 @@
   box-shadow: 0 1px 4px rgba(0,0,0,0.07);
   letter-spacing: 0.5px;
 }
-.pill-gray { background: #6b7280; }
-.pill-green { background: #16a34a; }
-.pill-blue { background: #2563eb; }
-.pill-orange { background: #f59e42; }
-.pill-red { background: #bb0000; }
-.pill-lime { background: #a3e635; }
-.pill-teal { background: #14b8a6; }
+.pill-gray { background: #6b7280; color: #fff; }
+.pill-green { background: #16a34a; color: #fff; }
+.pill-blue { background: #2563eb; color: #fff; }
+.pill-orange { background: #f59e42; color: #fff; }
+.pill-red { background: #bb0000; color: #fff; }
+.pill-lime { background: #a3e635; color: #fff; }
+.pill-teal { background: #14b8a6; color: #fff; }
 .pill-yellow { background: #fde047; color: #222; }
-.pill-indigo { background: #6366f1; }
-.pill-violet { background: #a78bfa; }
-.pill-pink { background: #ec4899; }
-.pill-royal\ blue { background: #4169e1; }
-.pill-light\ blue { background: #38bdf8; }
+.pill-indigo { background: #6366f1; color: #fff; }
+.pill-violet { background: #a78bfa; color: #fff; }
+.pill-pink { background: #ec4899; color: #fff; }
+.pill-royal\ blue { background: #4169e1; color: #fff; }
+.pill-light\ blue { background: #38bdf8; color: #fff; }
 .pill-peach { background: #ffbfae; color: #222; }
 .pill-lime, .pill-teal, .pill-indigo, .pill-violet, .pill-pink, .pill-royal\ blue, .pill-light\ blue, .pill-red, .pill-orange, .pill-green, .pill-blue, .pill-gray {
   color: #fff;
