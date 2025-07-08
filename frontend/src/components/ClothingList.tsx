@@ -20,6 +20,35 @@ interface Category {
   name: string;
 }
 
+function getColorHex(color: string): string {
+  switch (color.toLowerCase()) {
+    case 'red': return '#bb0000';
+    case 'orange': return '#f59e42';
+    case 'yellow': return '#fde047';
+    case 'green': return '#16a34a';
+    case 'blue': return '#2563eb';
+    case 'indigo': return '#6366f1';
+    case 'violet': return '#a78bfa';
+    case 'pink': return '#ec4899';
+    case 'royal blue': return '#4169e1';
+    case 'light blue': return '#38bdf8';
+    case 'lime': return '#a3e635';
+    case 'peach': return '#ffbfae';
+    case 'teal': return '#14b8a6';
+    case 'gray': return '#6b7280';
+    default: return '#6b7280';
+  }
+}
+function getContrastColor(bgColor: string): string {
+  // Simple luminance check for contrast
+  const color = bgColor.replace('#', '');
+  const r = parseInt(color.substr(0,2),16);
+  const g = parseInt(color.substr(2,2),16);
+  const b = parseInt(color.substr(4,2),16);
+  const luminance = (0.299*r + 0.587*g + 0.114*b)/255;
+  return luminance > 0.6 ? '#222' : '#fff';
+}
+
 const ClothingList: React.FC = () => {
   const { categoryId } = useParams<{ categoryId: string }>();
   const [category, setCategory] = useState<Category | null>(null);
@@ -238,7 +267,22 @@ const ClothingList: React.FC = () => {
                     <td data-label="Brand">{item.brand}</td>
                     <td data-label="Size">{item.size}</td>
                     <td data-label="Price">${item.price.toFixed(2)}</td>
-                    <td data-label="Color"><span className={`pill-badge pill-${item.color}`}>{item.color}</span></td>
+                    <td data-label="Color"><button
+                      className={`pill-badge pill-${item.color}`}
+                      style={{
+                        backgroundColor: getColorHex(item.color),
+                        color: getContrastColor(getColorHex(item.color)),
+                        border: 'none',
+                        cursor: 'default',
+                        pointerEvents: 'none',
+                        minWidth: 80,
+                        fontWeight: 700
+                      }}
+                      tabIndex={-1}
+                      aria-label={item.color}
+                    >
+                      {item.color}
+                    </button></td>
                     <td data-label="Actions">
                       <button className="osu-btn osu-btn-sm osu-btn-icon" title="Edit" onClick={() => { setEditItem(item); setShowModal(true); }}><FaEdit /></button>
                       <button className="osu-btn osu-btn-sm osu-btn-icon osu-btn-gray" title="Remove" onClick={() => handleRemove(item.id, item.sku)}><FaTrash /></button>
@@ -261,23 +305,6 @@ const ClothingList: React.FC = () => {
       </div>
     </div>
   );
-};
-
-// Remove priceToColor and use backend color chart for preview
-const colorChart: { [key: number]: string } = {
-  9: 'Red',
-  4: 'Orange',
-  10: 'Yellow',
-  6: 'Green',
-  7: 'Blue',
-  5: 'Indigo',
-  8: 'Violet',
-  3: 'Pink',
-  11: 'royal blue',
-  12: 'light blue',
-  2: 'lime',
-  15: 'Peach',
-  20: 'teal',
 };
 
 // Modal for add/edit item
@@ -351,6 +378,22 @@ const ItemModal: React.FC<{
       </div>
     </div>
   );
+};
+
+const colorChart: { [key: number]: string } = {
+  9: 'Red',
+  4: 'Orange',
+  10: 'Yellow',
+  6: 'Green',
+  7: 'Blue',
+  5: 'Indigo',
+  8: 'Violet',
+  3: 'Pink',
+  11: 'royal blue',
+  12: 'light blue',
+  2: 'lime',
+  15: 'Peach',
+  20: 'teal',
 };
 
 export default ClothingList;
