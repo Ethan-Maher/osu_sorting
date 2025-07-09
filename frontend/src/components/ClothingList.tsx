@@ -270,7 +270,7 @@ const ClothingList: React.FC = () => {
                     <td data-label="Color"><button
                       className={`pill-badge pill-${item.color}`}
                       style={{
-                        backgroundColor: getColorHex(item.color),
+                        backgroundColor: getColorHex(item.color) + ' !important',
                         color: getContrastColor(getColorHex(item.color)),
                         border: 'none',
                         cursor: 'default',
