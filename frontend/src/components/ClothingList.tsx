@@ -268,10 +268,8 @@ const ClothingList: React.FC = () => {
                     <td data-label="Size">{item.size}</td>
                     <td data-label="Price">${item.price.toFixed(2)}</td>
                     <td data-label="Color"><button
-                      className={`pill-badge pill-${item.color}`}
+                      className={`pill-badge pill-${item.color.toLowerCase().replace(' ', '\\ ')}`}
                       style={{
-                        backgroundColor: getColorHex(item.color) + ' !important',
-                        color: getContrastColor(getColorHex(item.color)),
                         border: 'none',
                         cursor: 'default',
                         pointerEvents: 'none',
@@ -362,7 +360,7 @@ const ItemModal: React.FC<{
             <label>Price</label>
             <input type="number" min="0" step="0.01" value={price} onChange={e => setPrice(e.target.value)} required />
             <div style={{ marginTop: 4, fontSize: '0.95em', color: color }}>
-              Color: <span className={`pill-badge pill-${color}`}>{color}</span>
+              Color: <span className={`pill-badge pill-${color.replace(/ /g, '\\ ')}`}>{color}</span>
             </div>
           </div>
           <div className="form-group">
@@ -381,18 +379,18 @@ const ItemModal: React.FC<{
 };
 
 const colorChart: { [key: number]: string } = {
-  9: 'Red',
-  4: 'Orange',
-  10: 'Yellow',
-  6: 'Green',
-  7: 'Blue',
-  5: 'Indigo',
-  8: 'Violet',
-  3: 'Pink',
+  9: 'red',
+  4: 'orange',
+  10: 'yellow',
+  6: 'green',
+  7: 'blue',
+  5: 'indigo',
+  8: 'violet',
+  3: 'pink',
   11: 'royal blue',
   12: 'light blue',
   2: 'lime',
-  15: 'Peach',
+  15: 'peach',
   20: 'teal',
 };
 
