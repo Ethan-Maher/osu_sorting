@@ -287,7 +287,7 @@ const ClothingList: React.FC = () => {
                     <td data-label="Brand">{item.brand}</td>
                     <td data-label="Size">{item.size}</td>
                     <td data-label="Price">${item.price.toFixed(2)}</td>
-                    <td data-label="Color"><button
+                    <td data-label="Color"><div
                       className={`pill-badge ${(getColorHex(item.color) === '#ff69b4') ? 'force-hotpink' : ''}`}
                       style={{
                         backgroundColor: getColorHex(item.color),
@@ -296,13 +296,15 @@ const ClothingList: React.FC = () => {
                         cursor: 'default',
                         pointerEvents: 'none',
                         minWidth: 80,
-                        fontWeight: 700
+                        fontWeight: 700,
+                        display: 'inline-block',
+                        textAlign: 'center'
                       }}
                       tabIndex={-1}
                       aria-label={item.color}
                     >
                       {item.color}
-                    </button></td>
+                    </div></td>
                     <td data-label="Actions">
                       <button className="osu-btn osu-btn-sm osu-btn-icon" title="Edit" onClick={() => { setEditItem(item); setShowModal(true); }}><FaEdit /></button>
                       <button className="osu-btn osu-btn-sm osu-btn-icon osu-btn-gray" title="Remove" onClick={() => handleRemove(item.id, item.sku)}><FaTrash /></button>
