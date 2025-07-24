@@ -272,6 +272,7 @@
   text-transform: capitalize;
   box-shadow: 0 1px 4px rgba(0,0,0,0.07);
   letter-spacing: 0.5px;
+  /* background intentionally omitted so inline style always wins */
 }
 .pill-gray { background: #6b7280; color: #fff; }
 .pill-green { background: #16a34a; color: #fff; }

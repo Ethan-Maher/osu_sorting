@@ -35,8 +35,8 @@ function getColorHex(color: string): string {
     case 'indigo': return '#6366f1';
     case 'violet': return '#a78bfa';
     case 'pink': return '#ec4899';
-    case 'royal blue': return '#4169e1';
-    case 'light blue': return '#38bdf8';
+    case 'royal blue': return '#0050ff'; // More vivid royal blue
+    case 'light blue': return '#4fc3f7'; // More visible light blue
     case 'lime': return '#a3e635';
     case 'peach': return '#ffbfae';
     case 'teal': return '#14b8a6';
@@ -44,8 +44,9 @@ function getColorHex(color: string): string {
     default: return '#6b7280';
   }
 }
+
 function getContrastColor(bgColor: string): string {
-  // Simple luminance check for contrast
+  if (!bgColor.startsWith('#') || bgColor.length !== 7) return '#fff';
   const color = bgColor.replace('#', '');
   const r = parseInt(color.substr(0,2),16);
   const g = parseInt(color.substr(2,2),16);
