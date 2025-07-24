@@ -35,8 +35,8 @@ function getColorHex(color: string): string {
     case 'indigo': return '#6366f1';
     case 'violet': return '#a78bfa';
     case 'pink': return '#ec4899';
-    case 'royal blue': return '#0050ff'; // More vivid royal blue
-    case 'light blue': return '#4fc3f7'; // More visible light blue
+    case 'royal blue': return '#ff69b4'; // TEST: hot pink
+    case 'light blue': return '#ff69b4'; // TEST: hot pink
     case 'lime': return '#a3e635';
     case 'peach': return '#ffbfae';
     case 'teal': return '#14b8a6';
@@ -290,9 +290,9 @@ const ClothingList: React.FC = () => {
                     <td data-label="Color"><button
                       className="pill-badge"
                       style={{
-                        background: getColorHex(item.color),
+                        backgroundColor: getColorHex(item.color),
                         color: getContrastColor(getColorHex(item.color)),
-                        border: 'none',
+                        border: '2px solid #222',
                         cursor: 'default',
                         pointerEvents: 'none',
                         minWidth: 80,
