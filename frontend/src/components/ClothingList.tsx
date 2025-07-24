@@ -4,6 +4,8 @@ import osuLogo from '../assets/osu.png';
 import { FaArrowLeft, FaEdit, FaTrash, FaArrowUp, FaArrowDown, FaPlus, FaFileExport, FaSearch, FaTimes } from 'react-icons/fa';
 import './ClothingList.css';
 import { API_URLS } from '../config';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 
 interface Item {
   id: string;
@@ -167,7 +169,21 @@ const ClothingList: React.FC = () => {
 
   // Export to Excel (placeholder)
   const handleExport = () => {
-    alert('Export to Excel coming soon!');
+    // Prepare data for export (filteredItems)
+    const exportData = filteredItems.map((item, idx) => ({
+      Position: idx + 1,
+      SKU: item.sku,
+      Brand: item.brand,
+      Size: item.size,
+      Price: item.price,
+      Color: item.color,
+    }));
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Clothing');
+    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const fileName = `${category?.name || 'clothing'}-inventory.xlsx`;
+    saveAs(new Blob([excelBuffer], { type: 'application/octet-stream' }), fileName);
   };
 
   // Sorting logic
