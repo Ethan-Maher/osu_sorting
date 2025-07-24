@@ -35,8 +35,8 @@ function getColorHex(color: string): string {
     case 'indigo': return '#6366f1';
     case 'violet': return '#a78bfa';
     case 'pink': return '#ec4899';
-    case 'royal blue': return '#ff69b4'; // TEST: hot pink
-    case 'light blue': return '#ff69b4'; // TEST: hot pink
+    case 'royal blue': return '#4169e1'; // Standard royal blue
+    case 'light blue': return '#38bdf8'; // Standard light blue
     case 'lime': return '#a3e635';
     case 'peach': return '#ffbfae';
     case 'teal': return '#14b8a6';
@@ -288,7 +288,7 @@ const ClothingList: React.FC = () => {
                     <td data-label="Size">{item.size}</td>
                     <td data-label="Price">${item.price.toFixed(2)}</td>
                     <td data-label="Color"><div
-                      className={`pill-badge ${(getColorHex(item.color) === '#ff69b4') ? 'force-hotpink' : ''}`}
+                      className="pill-badge"
                       style={{
                         backgroundColor: getColorHex(item.color),
                         color: getContrastColor(getColorHex(item.color)),
