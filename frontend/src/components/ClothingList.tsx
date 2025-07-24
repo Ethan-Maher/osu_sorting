@@ -23,7 +23,10 @@ interface Category {
 }
 
 function getColorHex(color: string): string {
-  switch (color.toLowerCase()) {
+  if (!color) return '#6b7280';
+  // Normalize: trim, lowercase, collapse multiple spaces
+  const normalized = color.trim().toLowerCase().replace(/\s+/g, ' ');
+  switch (normalized) {
     case 'red': return '#bb0000';
     case 'orange': return '#f59e42';
     case 'yellow': return '#fde047';
