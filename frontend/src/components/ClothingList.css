@@ -496,3 +496,10 @@
 html, body {
   overflow-x: hidden;
 } 
+
+/* Force hotpink for test pills */
+.force-hotpink {
+  background: #ff69b4 !important;
+  color: #222 !important;
+  border: 2px solid #222 !important;
+} 
