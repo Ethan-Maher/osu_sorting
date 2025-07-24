@@ -357,7 +357,7 @@ const ItemModal: React.FC<{
       categoryId: '', // will be set in parent
     });
   };
-
+ 
   return (
     <div className="modal-bg">
       <div className="modal-card glass">
