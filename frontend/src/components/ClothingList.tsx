@@ -284,8 +284,10 @@ const ClothingList: React.FC = () => {
                     <td data-label="Size">{item.size}</td>
                     <td data-label="Price">${item.price.toFixed(2)}</td>
                     <td data-label="Color"><button
-                      className={`pill-badge pill-${(item.color || '').toLowerCase().trim().replace(/\s+/g, '-')}`}
+                      className="pill-badge"
                       style={{
+                        background: getColorHex(item.color),
+                        color: getContrastColor(getColorHex(item.color)),
                         border: 'none',
                         cursor: 'default',
                         pointerEvents: 'none',
