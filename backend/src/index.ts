@@ -29,7 +29,7 @@ app.get('/api/items/:categoryId', async (req: Request, res: Response) => {
 
 // Add a new clothing item
 app.post('/api/items', async (req: Request, res: Response) => {
-  const { categoryId, brand, size, price, sku } = req.body;
+  const { categoryId, brand, size, price, sku, sold } = req.body;
   // Validate all fields
   if (
     !categoryId || !brand || !size || price === undefined || !sku ||
@@ -65,7 +65,7 @@ app.post('/api/items', async (req: Request, res: Response) => {
     });
     const order = (maxOrder._max?.order || 0) + 1;
     const item = await prisma.clothingItem.create({
-      data: { categoryId, brand, size, price, color: itemColor, sku, order },
+      data: { categoryId, brand, size, price, color: itemColor, sku, order, sold: sold === true },
     });
     res.json(item);
   } catch (e) {
@@ -111,6 +111,24 @@ app.put('/api/items/:id', async (req: Request, res: Response) => {
     res.json(item);
   } catch (e) {
     res.status(500).json({ error: 'Failed to update item.' });
+  }
+});
+
+// Update sold status of an item
+app.put('/api/items/:id/sold', async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { sold } = req.body;
+  if (typeof sold !== 'boolean') {
+    return res.status(400).json({ error: 'Sold status must be a boolean.' });
+  }
+  try {
+    const item = await prisma.clothingItem.update({
+      where: { id },
+      data: { sold },
+    });
+    res.json(item);
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to update sold status.' });
   }
 });
 

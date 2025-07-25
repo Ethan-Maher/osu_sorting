@@ -7,7 +7,8 @@
 */
 -- AlterTable
 ALTER TABLE "ClothingItem" DROP COLUMN "type",
-ADD COLUMN     "categoryId" TEXT NOT NULL;
+ADD COLUMN     "categoryId" TEXT NOT NULL,
+ADD COLUMN     "sold" BOOLEAN NOT NULL DEFAULT FALSE;
 
 -- CreateTable
 CREATE TABLE "Category" (

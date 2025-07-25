@@ -29,4 +29,5 @@ model ClothingItem {
   sku        String
   category   Category @relation(fields: [categoryId], references: [id])
   categoryId String
+  sold       Boolean  @default(false)
 }
