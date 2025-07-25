@@ -15,6 +15,7 @@ interface Item {
   price: number;
   color: string;
   sku: string;
+  sold?: boolean;
 }
 
 interface Category {
@@ -66,6 +67,7 @@ const ClothingList: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<'sku' | 'brand' | 'size' | 'price' | 'color'>('sku');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [tab, setTab] = useState<'current' | 'sold'>('current');
   const navigate = useNavigate();
 
   const fetchCategory = async () => {
@@ -171,6 +173,21 @@ const ClothingList: React.FC = () => {
     setItems(newItems.map((i, idx) => ({ ...i, order: idx + 1 })));
   };
 
+  const handleMoveSold = async (item: Item, sold: boolean) => {
+    try {
+      const res = await fetch(`${API_URLS.items}/${item.id}/sold`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sold }),
+      });
+      if (!res.ok) throw new Error('Failed to update sold status');
+      const updated = await res.json();
+      setItems(prev => prev.map(i => i.id === item.id ? { ...i, sold: updated.sold } : i));
+    } catch (e) {
+      setError('Failed to move item');
+    }
+  };
+
   // Export to Excel (placeholder)
   const handleExport = () => {
     // Prepare data for export (filteredItems)
@@ -220,6 +237,9 @@ const ClothingList: React.FC = () => {
     typeof item.sku === 'string' && item.sku.toLowerCase().includes(searchSku.toLowerCase())
   );
 
+  const currentItems = items.filter(i => !i.sold);
+  const soldItems = items.filter(i => i.sold);
+
   if (!categoryId) {
     return <div style={{ color: 'red', margin: 32 }}>Invalid category. Please go back and select a category.</div>;
   }
@@ -250,9 +270,11 @@ const ClothingList: React.FC = () => {
           <button onClick={() => setShowModal(true)} className="osu-btn"><FaPlus style={{marginRight: 6}} />Add Item</button>
           <button onClick={handleExport} className="osu-btn osu-btn-gray"><FaFileExport style={{marginRight: 6}} />Export</button>
         </div>
-        {loading ? (
-          <div style={{ marginTop: 24 }}>Loading...</div>
-        ) : (
+        <div className="tab-row">
+          <button className={tab === 'current' ? 'tab-active' : ''} onClick={() => setTab('current')}>Current Inventory</button>
+          <button className={tab === 'sold' ? 'tab-active' : ''} onClick={() => setTab('sold')}>Sold Inventory</button>
+        </div>
+        {tab === 'current' && (
           <div className="table-responsive">
             <table className="clothing-table">
               <thead>
@@ -277,10 +299,10 @@ const ClothingList: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredItems.length === 0 && (
+                {currentItems.length === 0 && (
                   <tr><td colSpan={7} style={{ textAlign: 'center', color: '#888' }}>No items yet.</td></tr>
                 )}
-                {filteredItems.map((item, idx) => (
+                {currentItems.map((item, idx) => (
                   <tr key={item.id}>
                     <td data-label="Position">{idx + 1}</td>
                     <td data-label="SKU">{item.sku}</td>
@@ -317,7 +339,80 @@ const ClothingList: React.FC = () => {
                       <button className="osu-btn osu-btn-sm osu-btn-icon" title="Edit" onClick={() => { setEditItem(item); setShowModal(true); }}><FaEdit /></button>
                       <button className="osu-btn osu-btn-sm osu-btn-icon osu-btn-gray" title="Remove" onClick={() => handleRemove(item.id, item.sku)}><FaTrash /></button>
                       <button className="osu-btn osu-btn-sm osu-btn-icon osu-btn-gray" title="Move Up" onClick={() => moveItem(idx, -1)} disabled={idx === 0}><FaArrowUp /></button>
-                      <button className="osu-btn osu-btn-sm osu-btn-icon osu-btn-gray" title="Move Down" onClick={() => moveItem(idx, 1)} disabled={idx === items.length - 1}><FaArrowDown /></button>
+                      <button className="osu-btn osu-btn-sm osu-btn-icon osu-btn-gray" title="Move Down" onClick={() => moveItem(idx, 1)} disabled={idx === currentItems.length - 1}><FaArrowDown /></button>
+                      <button className="osu-btn osu-btn-sm osu-btn-icon osu-btn-gray" title="Move to Sold" onClick={() => handleMoveSold(item, true)}>Move to Sold</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+        {tab === 'sold' && (
+          <div className="table-responsive">
+            <table className="clothing-table">
+              <thead>
+                <tr>
+                  <th>Position</th>
+                  <th style={{ cursor: 'pointer' }} onClick={() => handleSort('sku')}>
+                    SKU {sortBy === 'sku' && (sortDirection === 'asc' ? '▲' : '▼')}
+                  </th>
+                  <th style={{ cursor: 'pointer' }} onClick={() => handleSort('brand')}>
+                    Brand {sortBy === 'brand' && (sortDirection === 'asc' ? '▲' : '▼')}
+                  </th>
+                  <th style={{ cursor: 'pointer' }} onClick={() => handleSort('size')}>
+                    Size {sortBy === 'size' && (sortDirection === 'asc' ? '▲' : '▼')}
+                  </th>
+                  <th style={{ cursor: 'pointer' }} onClick={() => handleSort('price')}>
+                    Price {sortBy === 'price' && (sortDirection === 'asc' ? '▲' : '▼')}
+                  </th>
+                  <th style={{ cursor: 'pointer' }} onClick={() => handleSort('color')}>
+                    Color {sortBy === 'color' && (sortDirection === 'asc' ? '▲' : '▼')}
+                  </th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {soldItems.length === 0 && (
+                  <tr><td colSpan={7} style={{ textAlign: 'center', color: '#888' }}>No sold items yet.</td></tr>
+                )}
+                {soldItems.map((item, idx) => (
+                  <tr key={item.id}>
+                    <td data-label="Position">{idx + 1}</td>
+                    <td data-label="SKU">{item.sku}</td>
+                    <td data-label="Brand">{item.brand}</td>
+                    <td data-label="Size">{item.size}</td>
+                    <td data-label="Price">${item.price.toFixed(2)}</td>
+                    <td data-label="Color"><div
+                      className="pill-badge"
+                      style={{
+                        backgroundColor: getColorHex(item.color),
+                        color: getContrastColor(getColorHex(item.color)),
+                        border: '2px solid #222',
+                        cursor: 'default',
+                        pointerEvents: 'none',
+                        minWidth: 80,
+                        fontWeight: 700,
+                        display: 'inline-block',
+                        textAlign: 'center'
+                      }}
+                      tabIndex={-1}
+                      aria-label={item.color}
+                    >
+                      {item.color}
+                      {/* TEMP DEBUG: Show normalized and hex for two-word colors */}
+                      {(() => {
+                        const norm = (item.color || '').trim().toLowerCase().replace(/\s+/g, ' ');
+                        if (norm === 'royal blue' || norm === 'light blue') {
+                          return <div style={{fontSize: '0.7em', color: '#222'}}>[{norm}] [{getColorHex(item.color)}]</div>;
+                        }
+                        return null;
+                      })()}
+                    </div></td>
+                    <td data-label="Actions">
+                      <button className="osu-btn osu-btn-sm osu-btn-icon" title="Edit" onClick={() => { setEditItem(item); setShowModal(true); }}><FaEdit /></button>
+                      <button className="osu-btn osu-btn-sm osu-btn-icon osu-btn-gray" title="Remove" onClick={() => handleRemove(item.id, item.sku)}><FaTrash /></button>
+                      <button className="osu-btn osu-btn-sm osu-btn-icon osu-btn-gray" title="Move to Current" onClick={() => handleMoveSold(item, false)}>Move to Current</button>
                     </td>
                   </tr>
                 ))}
