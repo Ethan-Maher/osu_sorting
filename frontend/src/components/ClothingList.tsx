@@ -85,7 +85,9 @@ const ClothingList: React.FC = () => {
     try {
       const res = await fetch(`${API_URLS.items}/${categoryId}`);
       if (!res.ok) throw new Error('Failed to fetch items');
-      const data = await res.json();
+      let data = await res.json();
+      // Ensure every item has a boolean 'sold' field
+      data = data.map((item: Item) => ({ ...item, sold: !!item.sold }));
       setItems(data);
     } catch (e) {
       setError('Failed to load items');
