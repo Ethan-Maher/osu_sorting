@@ -240,8 +240,9 @@ const ClothingList: React.FC = () => {
     typeof item.sku === 'string' && item.sku.toLowerCase().includes(searchSku.toLowerCase())
   );
 
-  const currentItems = items.filter(i => i.sold === false);
-  const soldItems = items.filter(i => i.sold === true);
+  // More robust filtering for sold/current items
+  const currentItems = items.filter(i => !i.sold);
+  const soldItems = items.filter(i => !!i.sold);
 
   if (!categoryId) {
     return <div style={{ color: 'red', margin: 32 }}>Invalid category. Please go back and select a category.</div>;
