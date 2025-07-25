@@ -128,6 +128,7 @@ const ClothingList: React.FC = () => {
           price: item.price,
           sku: item.sku,
           categoryId,
+          sold: tab === 'sold',
         }),
       });
       if (!res.ok) throw new Error('Failed to create item');
