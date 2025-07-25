@@ -88,6 +88,7 @@ const ClothingList: React.FC = () => {
       let data = await res.json();
       // Ensure every item has a boolean 'sold' field
       data = data.map((item: Item) => ({ ...item, sold: !!item.sold }));
+      console.log('Fetched items:', data.map((item: Item) => ({ id: item.id, sku: item.sku, sold: item.sold })));
       setItems(data);
     } catch (e) {
       setError('Failed to load items');
@@ -178,15 +179,19 @@ const ClothingList: React.FC = () => {
 
   const handleMoveSold = async (item: Item, sold: boolean) => {
     try {
+      console.log('Moving item to sold:', { id: item.id, sku: item.sku, sold: sold });
       const res = await fetch(`${API_URLS.items}/${item.id}/sold`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sold: !!sold }),
       });
       if (!res.ok) throw new Error('Failed to update sold status');
+      const updatedItem = await res.json();
+      console.log('Updated item response:', updatedItem);
       // Always refetch items after move
       fetchItems();
     } catch (e) {
+      console.error('Error moving item:', e);
       setError('Failed to move item');
     }
   };
@@ -240,9 +245,27 @@ const ClothingList: React.FC = () => {
     typeof item.sku === 'string' && item.sku.toLowerCase().includes(searchSku.toLowerCase())
   );
 
-  // More robust filtering for sold/current items
-  const currentItems = items.filter(i => !i.sold);
-  const soldItems = items.filter(i => !!i.sold);
+  // More robust filtering for sold/current items - use sortedItems to maintain sorting
+  const currentItems = sortedItems.filter(i => !i.sold);
+  const soldItems = sortedItems.filter(i => !!i.sold);
+
+  // Apply search filter to sold/current items
+  const filteredCurrentItems = currentItems.filter(item =>
+    typeof item.sku === 'string' && item.sku.toLowerCase().includes(searchSku.toLowerCase())
+  );
+  const filteredSoldItems = soldItems.filter(item =>
+    typeof item.sku === 'string' && item.sku.toLowerCase().includes(searchSku.toLowerCase())
+  );
+
+  // Debug logging
+  console.log('Filtering results:', {
+    totalItems: items.length,
+    currentItems: currentItems.length,
+    soldItems: soldItems.length,
+    filteredCurrentItems: filteredCurrentItems.length,
+    filteredSoldItems: filteredSoldItems.length,
+    searchSku
+  });
 
   if (!categoryId) {
     return <div style={{ color: 'red', margin: 32 }}>Invalid category. Please go back and select a category.</div>;
@@ -303,10 +326,10 @@ const ClothingList: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {currentItems.length === 0 && (
+                {filteredCurrentItems.length === 0 && (
                   <tr><td colSpan={7} style={{ textAlign: 'center', color: '#888' }}>No items yet.</td></tr>
                 )}
-                {currentItems.map((item, idx) => (
+                {filteredCurrentItems.map((item, idx) => (
                   <tr key={item.id}>
                     <td data-label="Position">{idx + 1}</td>
                     <td data-label="SKU">{item.sku}</td>
@@ -343,7 +366,7 @@ const ClothingList: React.FC = () => {
                       <button className="osu-btn osu-btn-sm osu-btn-icon" title="Edit" onClick={() => { setEditItem(item); setShowModal(true); }}><FaEdit /></button>
                       <button className="osu-btn osu-btn-sm osu-btn-icon osu-btn-gray" title="Remove" onClick={() => handleRemove(item.id, item.sku)}><FaTrash /></button>
                       <button className="osu-btn osu-btn-sm osu-btn-icon osu-btn-gray" title="Move Up" onClick={() => moveItem(idx, -1)} disabled={idx === 0}><FaArrowUp /></button>
-                      <button className="osu-btn osu-btn-sm osu-btn-icon osu-btn-gray" title="Move Down" onClick={() => moveItem(idx, 1)} disabled={idx === currentItems.length - 1}><FaArrowDown /></button>
+                      <button className="osu-btn osu-btn-sm osu-btn-icon osu-btn-gray" title="Move Down" onClick={() => moveItem(idx, 1)} disabled={idx === filteredCurrentItems.length - 1}><FaArrowDown /></button>
                       <button className="osu-btn osu-btn-sm osu-btn-icon osu-btn-gray" title="Move to Sold" onClick={() => handleMoveSold(item, true)}>Move to Sold</button>
                     </td>
                   </tr>
@@ -377,10 +400,10 @@ const ClothingList: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {soldItems.length === 0 && (
+                {filteredSoldItems.length === 0 && (
                   <tr><td colSpan={7} style={{ textAlign: 'center', color: '#888' }}>No sold items yet.</td></tr>
                 )}
-                {soldItems.map((item, idx) => (
+                {filteredSoldItems.map((item, idx) => (
                   <tr key={item.id}>
                     <td data-label="Position">{idx + 1}</td>
                     <td data-label="SKU">{item.sku}</td>
