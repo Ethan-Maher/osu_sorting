@@ -28,6 +28,34 @@ app.get('/api/items/:categoryId', async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch items' });
     }
 });
+// Get only unsold items by categoryId
+app.get('/api/items/:categoryId/current', async (req, res) => {
+    const { categoryId } = req.params;
+    try {
+        const items = await prisma.clothingItem.findMany({
+            where: { categoryId, sold: false },
+            orderBy: { order: 'asc' },
+        });
+        res.json(items);
+    }
+    catch (e) {
+        res.status(500).json({ error: 'Failed to fetch current items' });
+    }
+});
+// Get only sold items by categoryId
+app.get('/api/items/:categoryId/sold', async (req, res) => {
+    const { categoryId } = req.params;
+    try {
+        const items = await prisma.clothingItem.findMany({
+            where: { categoryId, sold: true },
+            orderBy: { order: 'asc' },
+        });
+        res.json(items);
+    }
+    catch (e) {
+        res.status(500).json({ error: 'Failed to fetch sold items' });
+    }
+});
 // Add a new clothing item
 app.post('/api/items', async (req, res) => {
     var _a;

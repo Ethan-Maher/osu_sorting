@@ -81,14 +81,20 @@ const ClothingList: React.FC = () => {
     }
   };
 
-  const fetchItems = async () => {
+  const fetchItems = async (tabOverride?: 'current' | 'sold') => {
+    setLoading(true);
     try {
-      const res = await fetch(`${API_URLS.items}/${categoryId}`);
+      let url = '';
+      const tabToFetch = tabOverride || tab;
+      if (tabToFetch === 'current') {
+        url = `${API_URLS.items}/${categoryId}/current`;
+      } else {
+        url = `${API_URLS.items}/${categoryId}/sold`;
+      }
+      const res = await fetch(url);
       if (!res.ok) throw new Error('Failed to fetch items');
       let data = await res.json();
-      // Ensure every item has a boolean 'sold' field
       data = data.map((item: Item) => ({ ...item, sold: !!item.sold }));
-      console.log('Fetched items:', data.map((item: Item) => ({ id: item.id, sku: item.sku, sold: item.sold })));
       setItems(data);
     } catch (e) {
       setError('Failed to load items');
@@ -100,7 +106,8 @@ const ClothingList: React.FC = () => {
   useEffect(() => {
     fetchCategory();
     fetchItems();
-  }, [categoryId]);
+    // eslint-disable-next-line
+  }, [categoryId, tab]);
 
   // Add or update item
   const handleSave = async (item: Item) => {
@@ -240,30 +247,14 @@ const ClothingList: React.FC = () => {
     return 0;
   });
 
-  // Filtered items by SKU
   const filteredItems = sortedItems.filter(item =>
-    typeof item.sku === 'string' && item.sku.toLowerCase().includes(searchSku.toLowerCase())
-  );
-
-  // More robust filtering for sold/current items - use sortedItems to maintain sorting
-  const currentItems = sortedItems.filter(i => !i.sold);
-  const soldItems = sortedItems.filter(i => !!i.sold);
-
-  // Apply search filter to sold/current items
-  const filteredCurrentItems = currentItems.filter(item =>
-    typeof item.sku === 'string' && item.sku.toLowerCase().includes(searchSku.toLowerCase())
-  );
-  const filteredSoldItems = soldItems.filter(item =>
     typeof item.sku === 'string' && item.sku.toLowerCase().includes(searchSku.toLowerCase())
   );
 
   // Debug logging
   console.log('Filtering results:', {
     totalItems: items.length,
-    currentItems: currentItems.length,
-    soldItems: soldItems.length,
-    filteredCurrentItems: filteredCurrentItems.length,
-    filteredSoldItems: filteredSoldItems.length,
+    filteredItems: filteredItems.length,
     searchSku
   });
 
@@ -301,7 +292,9 @@ const ClothingList: React.FC = () => {
           <button className={tab === 'current' ? 'tab-active' : ''} onClick={() => setTab('current')}>Current Inventory</button>
           <button className={tab === 'sold' ? 'tab-active' : ''} onClick={() => setTab('sold')}>Sold Inventory</button>
         </div>
-        {tab === 'current' && (
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '20px 0' }}>Loading...</div>
+        ) : (
           <div className="table-responsive">
             <table className="clothing-table">
               <thead>
@@ -326,10 +319,10 @@ const ClothingList: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredCurrentItems.length === 0 && (
+                {filteredItems.length === 0 && (
                   <tr><td colSpan={7} style={{ textAlign: 'center', color: '#888' }}>No items yet.</td></tr>
                 )}
-                {filteredCurrentItems.map((item, idx) => (
+                {filteredItems.map((item, idx) => (
                   <tr key={item.id}>
                     <td data-label="Position">{idx + 1}</td>
                     <td data-label="SKU">{item.sku}</td>
@@ -366,80 +359,8 @@ const ClothingList: React.FC = () => {
                       <button className="osu-btn osu-btn-sm osu-btn-icon" title="Edit" onClick={() => { setEditItem(item); setShowModal(true); }}><FaEdit /></button>
                       <button className="osu-btn osu-btn-sm osu-btn-icon osu-btn-gray" title="Remove" onClick={() => handleRemove(item.id, item.sku)}><FaTrash /></button>
                       <button className="osu-btn osu-btn-sm osu-btn-icon osu-btn-gray" title="Move Up" onClick={() => moveItem(idx, -1)} disabled={idx === 0}><FaArrowUp /></button>
-                      <button className="osu-btn osu-btn-sm osu-btn-icon osu-btn-gray" title="Move Down" onClick={() => moveItem(idx, 1)} disabled={idx === filteredCurrentItems.length - 1}><FaArrowDown /></button>
+                      <button className="osu-btn osu-btn-sm osu-btn-icon osu-btn-gray" title="Move Down" onClick={() => moveItem(idx, 1)} disabled={idx === filteredItems.length - 1}><FaArrowDown /></button>
                       <button className="osu-btn osu-btn-sm osu-btn-icon osu-btn-gray" title="Move to Sold" onClick={() => handleMoveSold(item, true)}>Move to Sold</button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-        {tab === 'sold' && (
-          <div className="table-responsive">
-            <table className="clothing-table">
-              <thead>
-                <tr>
-                  <th>Position</th>
-                  <th style={{ cursor: 'pointer' }} onClick={() => handleSort('sku')}>
-                    SKU {sortBy === 'sku' && (sortDirection === 'asc' ? '▲' : '▼')}
-                  </th>
-                  <th style={{ cursor: 'pointer' }} onClick={() => handleSort('brand')}>
-                    Brand {sortBy === 'brand' && (sortDirection === 'asc' ? '▲' : '▼')}
-                  </th>
-                  <th style={{ cursor: 'pointer' }} onClick={() => handleSort('size')}>
-                    Size {sortBy === 'size' && (sortDirection === 'asc' ? '▲' : '▼')}
-                  </th>
-                  <th style={{ cursor: 'pointer' }} onClick={() => handleSort('price')}>
-                    Price {sortBy === 'price' && (sortDirection === 'asc' ? '▲' : '▼')}
-                  </th>
-                  <th style={{ cursor: 'pointer' }} onClick={() => handleSort('color')}>
-                    Color {sortBy === 'color' && (sortDirection === 'asc' ? '▲' : '▼')}
-                  </th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredSoldItems.length === 0 && (
-                  <tr><td colSpan={7} style={{ textAlign: 'center', color: '#888' }}>No sold items yet.</td></tr>
-                )}
-                {filteredSoldItems.map((item, idx) => (
-                  <tr key={item.id}>
-                    <td data-label="Position">{idx + 1}</td>
-                    <td data-label="SKU">{item.sku}</td>
-                    <td data-label="Brand">{item.brand}</td>
-                    <td data-label="Size">{item.size}</td>
-                    <td data-label="Price">${item.price.toFixed(2)}</td>
-                    <td data-label="Color"><div
-                      className="pill-badge"
-                      style={{
-                        backgroundColor: getColorHex(item.color),
-                        color: getContrastColor(getColorHex(item.color)),
-                        border: '2px solid #222',
-                        cursor: 'default',
-                        pointerEvents: 'none',
-                        minWidth: 80,
-                        fontWeight: 700,
-                        display: 'inline-block',
-                        textAlign: 'center'
-                      }}
-                      tabIndex={-1}
-                      aria-label={item.color}
-                    >
-                      {item.color}
-                      {/* TEMP DEBUG: Show normalized and hex for two-word colors */}
-                      {(() => {
-                        const norm = (item.color || '').trim().toLowerCase().replace(/\s+/g, ' ');
-                        if (norm === 'royal blue' || norm === 'light blue') {
-                          return <div style={{fontSize: '0.7em', color: '#222'}}>[{norm}] [{getColorHex(item.color)}]</div>;
-                        }
-                        return null;
-                      })()}
-                    </div></td>
-                    <td data-label="Actions">
-                      <button className="osu-btn osu-btn-sm osu-btn-icon" title="Edit" onClick={() => { setEditItem(item); setShowModal(true); }}><FaEdit /></button>
-                      <button className="osu-btn osu-btn-sm osu-btn-icon osu-btn-gray" title="Remove" onClick={() => handleRemove(item.id, item.sku)}><FaTrash /></button>
-                      <button className="osu-btn osu-btn-sm osu-btn-icon osu-btn-gray" title="Move to Current" onClick={() => handleMoveSold(item, false)}>Move to Current</button>
                     </td>
                   </tr>
                 ))}

@@ -27,6 +27,34 @@ app.get('/api/items/:categoryId', async (req: Request, res: Response) => {
   }
 });
 
+// Get only unsold items by categoryId
+app.get('/api/items/:categoryId/current', async (req: Request, res: Response) => {
+  const { categoryId } = req.params;
+  try {
+    const items = await prisma.clothingItem.findMany({
+      where: { categoryId, sold: false },
+      orderBy: { order: 'asc' },
+    });
+    res.json(items);
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to fetch current items' });
+  }
+});
+
+// Get only sold items by categoryId
+app.get('/api/items/:categoryId/sold', async (req: Request, res: Response) => {
+  const { categoryId } = req.params;
+  try {
+    const items = await prisma.clothingItem.findMany({
+      where: { categoryId, sold: true },
+      orderBy: { order: 'asc' },
+    });
+    res.json(items);
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to fetch sold items' });
+  }
+});
+
 // Add a new clothing item
 app.post('/api/items', async (req: Request, res: Response) => {
   const { categoryId, brand, size, price, sku, sold } = req.body;
