@@ -127,7 +127,12 @@ app.put('/api/items/:id/sold', async (req: Request, res: Response) => {
       data: { sold },
     });
     res.json(item);
-  } catch (e) {
+  } catch (e: any) {
+    console.error('Error updating sold status:', e);
+    // Check if it's a "not found" error
+    if (e.code === 'P2025' || e.message?.includes('Record to update not found')) {
+      return res.status(404).json({ error: 'Item not found.' });
+    }
     res.status(500).json({ error: 'Failed to update sold status.' });
   }
 });

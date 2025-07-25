@@ -112,6 +112,7 @@ app.put('/api/items/:id', async (req, res) => {
 });
 // Update sold status of an item
 app.put('/api/items/:id/sold', async (req, res) => {
+    var _a;
     const { id } = req.params;
     const { sold } = req.body;
     if (typeof sold !== 'boolean') {
@@ -125,6 +126,11 @@ app.put('/api/items/:id/sold', async (req, res) => {
         res.json(item);
     }
     catch (e) {
+        console.error('Error updating sold status:', e);
+        // Check if it's a "not found" error
+        if (e.code === 'P2025' || ((_a = e.message) === null || _a === void 0 ? void 0 : _a.includes('Record to update not found'))) {
+            return res.status(404).json({ error: 'Item not found.' });
+        }
         res.status(500).json({ error: 'Failed to update sold status.' });
     }
 });
