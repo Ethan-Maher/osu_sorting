@@ -117,8 +117,8 @@ const ClothingList: React.FC = () => {
         }),
       });
       if (!res.ok) throw new Error('Failed to update item');
-      const updatedItem = await res.json();
-      setItems(items.map(i => i.id === updatedItem.id ? updatedItem : i));
+      // Always refetch items after update
+      fetchItems();
     } else {
       // Add new
       const res = await fetch(API_URLS.items, {
@@ -130,12 +130,12 @@ const ClothingList: React.FC = () => {
           price: item.price,
           sku: item.sku,
           categoryId,
-          sold: tab === 'sold',
+          sold: tab === 'sold' ? true : false,
         }),
       });
       if (!res.ok) throw new Error('Failed to create item');
-      const newItem = await res.json();
-      setItems([...items, newItem]);
+      // Always refetch items after add
+      fetchItems();
     }
     setShowModal(false);
     setEditItem(null);
@@ -181,11 +181,11 @@ const ClothingList: React.FC = () => {
       const res = await fetch(`${API_URLS.items}/${item.id}/sold`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sold }),
+        body: JSON.stringify({ sold: !!sold }),
       });
       if (!res.ok) throw new Error('Failed to update sold status');
-      const updated = await res.json();
-      setItems(prev => prev.map(i => i.id === item.id ? { ...i, sold: updated.sold } : i));
+      // Always refetch items after move
+      fetchItems();
     } catch (e) {
       setError('Failed to move item');
     }
