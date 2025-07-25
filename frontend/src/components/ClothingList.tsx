@@ -392,7 +392,7 @@ const ItemModal: React.FC<{
             <label>Price</label>
             <input type="number" min="0" step="0.01" value={price} onChange={e => setPrice(e.target.value)} required />
             <div style={{ marginTop: 4, fontSize: '0.95em', color: color }}>
-              Color: <span className={`pill-badge pill-${color.replace(/ /g, '\\ ')}`}>{color}</span>
+              Color: <span className={`pill-badge pill-${color.trim().toLowerCase().replace(/\s+/g, '-')}`}>{color}</span>
             </div>
           </div>
           <div className="form-group">
