@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 const PORT = process.env.PORT || 4000;
 
 app.use(cors({
-  origin: 'https://osu-sorting.vercel.app',
+  origin: ['https://osu-sorting.vercel.app', 'http://localhost:3000', 'http://localhost:3001'],
   credentials: true,
 }));
 app.use(express.json());
@@ -205,6 +205,19 @@ app.get('/api/categories', async (req: Request, res: Response) => {
     res.json(categories);
   } catch (e) {
     res.status(500).json({ error: 'Failed to fetch categories.' });
+  }
+});
+
+app.get('/api/categories/:id', async (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    const category = await prisma.category.findUnique({ where: { id } });
+    if (!category) {
+      return res.status(404).json({ error: 'Category not found.' });
+    }
+    res.json(category);
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to fetch category.' });
   }
 });
 

@@ -91,13 +91,23 @@ const ClothingList: React.FC = () => {
       } else {
         url = `${API_URLS.items}/${categoryId}/sold`;
       }
+      console.log('API_BASE_URL:', API_BASE_URL);
+      console.log('API_URLS.items:', API_URLS.items);
+      console.log('Fetching items from:', url, 'for tab:', tabToFetch);
       const res = await fetch(url);
-      if (!res.ok) throw new Error('Failed to fetch items');
+      console.log('Response status:', res.status, res.statusText);
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error('API Error:', errorText);
+        throw new Error(`Failed to fetch items: ${res.status} ${res.statusText}`);
+      }
       let data = await res.json();
+      console.log('Fetched items:', data);
       data = data.map((item: Item) => ({ ...item, sold: !!item.sold }));
       setItems(data);
     } catch (e) {
-      setError('Failed to load items');
+      console.error('Error fetching items:', e);
+      setError(`Failed to load items: ${e instanceof Error ? e.message : 'Unknown error'}`);
     } finally {
       setLoading(false);
     }
@@ -129,24 +139,37 @@ const ClothingList: React.FC = () => {
       fetchItems();
     } else {
       // Add new
+      const requestBody = {
+        brand: item.brand,
+        size: item.size,
+        price: item.price,
+        sku: item.sku,
+        categoryId,
+        sold: tab === 'sold' ? true : false,
+      };
+      console.log('Adding new item with data:', requestBody);
       const res = await fetch(API_URLS.items, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          brand: item.brand,
-          size: item.size,
-          price: item.price,
-          sku: item.sku,
-          categoryId,
-          sold: tab === 'sold' ? true : false,
-        }),
+        body: JSON.stringify(requestBody),
       });
-      if (!res.ok) throw new Error('Failed to create item');
+      console.log('Create item response status:', res.status, res.statusText);
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error('Create item API Error:', errorText);
+        throw new Error(`Failed to create item: ${res.status} ${res.statusText}`);
+      }
+      const createdItem = await res.json();
+      console.log('Created item response:', createdItem);
       // Always refetch items after add
       fetchItems();
     }
     setShowModal(false);
     setEditItem(null);
+  } catch (e) {
+    console.error('Error in handleSave:', e);
+    setError(`Failed to save item: ${e instanceof Error ? e.message : 'Unknown error'}`);
+  }
   };
 
   // Remove item
@@ -255,7 +278,9 @@ const ClothingList: React.FC = () => {
   console.log('Filtering results:', {
     totalItems: items.length,
     filteredItems: filteredItems.length,
-    searchSku
+    searchSku,
+    items: items,
+    filteredItems: filteredItems
   });
 
   if (!categoryId) {
