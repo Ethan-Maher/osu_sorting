@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import osuLogo from '../assets/osu.png';
 import { FaArrowLeft, FaEdit, FaTrash, FaArrowUp, FaArrowDown, FaPlus, FaFileExport, FaSearch, FaTimes } from 'react-icons/fa';
 import './ClothingList.css';
-import { API_URLS } from '../config';
+import { API_URLS, API_BASE_URL } from '../config';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 
@@ -121,55 +121,56 @@ const ClothingList: React.FC = () => {
 
   // Add or update item
   const handleSave = async (item: Item) => {
-    if (editItem) {
-      // Edit
-      const res = await fetch(`${API_URLS.items}/${item.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+    try {
+      if (editItem) {
+        // Edit
+        const res = await fetch(`${API_URLS.items}/${item.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            brand: item.brand,
+            size: item.size,
+            price: item.price,
+            sku: item.sku,
+            categoryId,
+          }),
+        });
+        if (!res.ok) throw new Error('Failed to update item');
+        // Always refetch items after update
+        fetchItems();
+      } else {
+        // Add new
+        const requestBody = {
           brand: item.brand,
           size: item.size,
           price: item.price,
           sku: item.sku,
           categoryId,
-        }),
-      });
-      if (!res.ok) throw new Error('Failed to update item');
-      // Always refetch items after update
-      fetchItems();
-    } else {
-      // Add new
-      const requestBody = {
-        brand: item.brand,
-        size: item.size,
-        price: item.price,
-        sku: item.sku,
-        categoryId,
-        sold: tab === 'sold' ? true : false,
-      };
-      console.log('Adding new item with data:', requestBody);
-      const res = await fetch(API_URLS.items, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody),
-      });
-      console.log('Create item response status:', res.status, res.statusText);
-      if (!res.ok) {
-        const errorText = await res.text();
-        console.error('Create item API Error:', errorText);
-        throw new Error(`Failed to create item: ${res.status} ${res.statusText}`);
+          sold: tab === 'sold' ? true : false,
+        };
+        console.log('Adding new item with data:', requestBody);
+        const res = await fetch(API_URLS.items, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(requestBody),
+        });
+        console.log('Create item response status:', res.status, res.statusText);
+        if (!res.ok) {
+          const errorText = await res.text();
+          console.error('Create item API Error:', errorText);
+          throw new Error(`Failed to create item: ${res.status} ${res.statusText}`);
+        }
+        const createdItem = await res.json();
+        console.log('Created item response:', createdItem);
+        // Always refetch items after add
+        fetchItems();
       }
-      const createdItem = await res.json();
-      console.log('Created item response:', createdItem);
-      // Always refetch items after add
-      fetchItems();
+      setShowModal(false);
+      setEditItem(null);
+    } catch (e) {
+      console.error('Error in handleSave:', e);
+      setError(`Failed to save item: ${e instanceof Error ? e.message : 'Unknown error'}`);
     }
-    setShowModal(false);
-    setEditItem(null);
-  } catch (e) {
-    console.error('Error in handleSave:', e);
-    setError(`Failed to save item: ${e instanceof Error ? e.message : 'Unknown error'}`);
-  }
   };
 
   // Remove item
@@ -279,8 +280,7 @@ const ClothingList: React.FC = () => {
     totalItems: items.length,
     filteredItems: filteredItems.length,
     searchSku,
-    items: items,
-    filteredItems: filteredItems
+    items: items
   });
 
   if (!categoryId) {
