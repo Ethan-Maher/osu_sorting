@@ -465,14 +465,6 @@ const ClothingList: React.FC = () => {
                       aria-label={item.color}
                     >
                       {item.color}
-                      {/* TEMP DEBUG: Show normalized and hex for two-word colors */}
-                      {(() => {
-                        const norm = (item.color || '').trim().toLowerCase().replace(/\s+/g, ' ');
-                        if (norm === 'royal blue' || norm === 'light blue') {
-                          return <div style={{fontSize: '0.7em', color: '#222'}}>[{norm}] [{getColorHex(item.color)}]</div>;
-                        }
-                        return null;
-                      })()}
                     </div></td>
                     <td data-label="Actions">
                       <button className="osu-btn osu-btn-sm osu-btn-icon" title="Edit" onClick={() => { setEditItem(item); setShowModal(true); }}><FaEdit /></button>
