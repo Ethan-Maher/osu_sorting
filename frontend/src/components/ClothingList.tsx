@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import osuLogo from '../assets/osu.png';
-import { FaArrowLeft, FaEdit, FaTrash, FaArrowUp, FaArrowDown, FaPlus, FaFileExport, FaSearch, FaTimes } from 'react-icons/fa';
+import { FaArrowLeft, FaEdit, FaTrash, FaArrowUp, FaArrowDown, FaPlus, FaFileExport, FaFileImport, FaSearch, FaTimes } from 'react-icons/fa';
 import './ClothingList.css';
 import { API_URLS, API_BASE_URL } from '../config';
 import * as XLSX from 'xlsx';
@@ -227,7 +227,7 @@ const ClothingList: React.FC = () => {
     }
   };
 
-  // Export to Excel (placeholder)
+  // Export to Excel
   const handleExport = () => {
     // Prepare data for export (filteredItems)
     const exportData = filteredItems.map((item, idx) => ({
@@ -244,6 +244,96 @@ const ClothingList: React.FC = () => {
     const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
     const fileName = `${category?.name || 'clothing'}-inventory.xlsx`;
     saveAs(new Blob([excelBuffer], { type: 'application/octet-stream' }), fileName);
+  };
+
+  // Import from Excel/CSV
+  const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const data = await file.arrayBuffer();
+      const workbook = XLSX.read(data, { type: 'array' });
+      const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+      const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+      console.log('Imported data:', jsonData);
+
+      // Process each row and add items
+      let successCount = 0;
+      let errorCount = 0;
+      const errors: string[] = [];
+
+      for (const row of jsonData) {
+        try {
+          // Extract data from row (handle different column names)
+          const sku = (row as any).SKU || (row as any).sku || (row as any)['SKU/Tag'];
+          const brand = (row as any).Brand || (row as any).brand;
+          const size = (row as any).Size || (row as any).size;
+          const price = (row as any).Price || (row as any).price;
+          const color = (row as any).Color || (row as any).color;
+
+          // Validate required fields
+          if (!sku || !brand || !size || price === undefined || price === null) {
+            errors.push(`Row missing required fields: SKU=${sku}, Brand=${brand}, Size=${size}, Price=${price}`);
+            errorCount++;
+            continue;
+          }
+
+          // Convert price to number
+          const priceNum = typeof price === 'string' ? parseFloat(price) : price;
+          if (isNaN(priceNum) || priceNum < 0) {
+            errors.push(`Invalid price for SKU ${sku}: ${price}`);
+            errorCount++;
+            continue;
+          }
+
+          // Add item to database
+          const requestBody = {
+            brand: brand.toString().trim(),
+            size: size.toString().trim(),
+            price: priceNum,
+            sku: sku.toString().trim(),
+            categoryId,
+            sold: tab === 'sold' ? true : false,
+          };
+
+          console.log('Adding imported item:', requestBody);
+          const res = await fetch(API_URLS.items, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(requestBody),
+          });
+
+          if (!res.ok) {
+            const errorText = await res.text();
+            errors.push(`Failed to add SKU ${sku}: ${errorText}`);
+            errorCount++;
+          } else {
+            successCount++;
+          }
+        } catch (e) {
+          errors.push(`Error processing row: ${e instanceof Error ? e.message : 'Unknown error'}`);
+          errorCount++;
+        }
+      }
+
+      // Show results
+      if (successCount > 0) {
+        alert(`Import completed!\n\nSuccessfully imported: ${successCount} items\nFailed: ${errorCount} items${errors.length > 0 ? '\n\nErrors:\n' + errors.slice(0, 5).join('\n') + (errors.length > 5 ? '\n... and ' + (errors.length - 5) + ' more errors' : '') : ''}`);
+        // Refresh the items list
+        fetchItems();
+      } else {
+        alert(`Import failed!\n\nNo items were imported.\nErrors:\n${errors.join('\n')}`);
+      }
+
+      // Clear the file input
+      event.target.value = '';
+    } catch (e) {
+      console.error('Error importing file:', e);
+      alert(`Error importing file: ${e instanceof Error ? e.message : 'Unknown error'}`);
+      event.target.value = '';
+    }
   };
 
   // Sorting logic
@@ -312,6 +402,15 @@ const ClothingList: React.FC = () => {
           </div>
           <button onClick={() => setShowModal(true)} className="osu-btn"><FaPlus style={{marginRight: 6}} />Add Item</button>
           <button onClick={handleExport} className="osu-btn osu-btn-gray"><FaFileExport style={{marginRight: 6}} />Export</button>
+          <label className="osu-btn osu-btn-gray" style={{ cursor: 'pointer', margin: 0 }}>
+            <FaFileImport style={{marginRight: 6}} />Import
+            <input
+              type="file"
+              accept=".xlsx,.xls,.csv"
+              onChange={handleImport}
+              style={{ display: 'none' }}
+            />
+          </label>
         </div>
         <div className="tab-row">
           <button className={tab === 'current' ? 'tab-active' : ''} onClick={() => setTab('current')}>Current Inventory</button>
