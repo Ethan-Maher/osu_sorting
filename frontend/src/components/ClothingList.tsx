@@ -671,10 +671,10 @@ const ImportModal: React.FC<{
             fontFamily: 'monospace',
             fontSize: '14px'
           }}>
-            <div>SKU    | Brand        | Size | Price | Color</div>
-            <div>ABC123 | Nike         | M    | 15.99 | Blue</div>
-            <div>DEF456 | Adidas       | L    | 12.50 | Red</div>
-            <div>GHI789 | Under Armour | S    | 8.75  | Green</div>
+            <div style={{whiteSpace: 'pre'}}>SKU    | Brand        | Size | Price | Color</div>
+            <div style={{whiteSpace: 'pre'}}>ABC123 | Nike         | M    | 15.99 | Blue</div>
+            <div style={{whiteSpace: 'pre'}}>DEF456 | Adidas       | L    | 12.50 | Red</div>
+            <div style={{whiteSpace: 'pre'}}>GHI789 | Under Armour | S    | 8.75  | Green</div>
           </div>
         </div>
 
