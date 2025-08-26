@@ -68,6 +68,7 @@ const ClothingList: React.FC = () => {
   const [sortBy, setSortBy] = useState<'sku' | 'brand' | 'size' | 'price' | 'color'>('sku');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [tab, setTab] = useState<'current' | 'sold'>('current');
+  const [showImportModal, setShowImportModal] = useState(false);
   const navigate = useNavigate();
 
   const fetchCategory = async () => {
@@ -402,15 +403,9 @@ const ClothingList: React.FC = () => {
           </div>
           <button onClick={() => setShowModal(true)} className="osu-btn"><FaPlus style={{marginRight: 6}} />Add Item</button>
           <button onClick={handleExport} className="osu-btn osu-btn-gray"><FaFileExport style={{marginRight: 6}} />Export</button>
-          <label className="osu-btn osu-btn-gray" style={{ cursor: 'pointer', margin: 0 }}>
+          <button onClick={() => setShowImportModal(true)} className="osu-btn osu-btn-gray">
             <FaFileImport style={{marginRight: 6}} />Import
-            <input
-              type="file"
-              accept=".xlsx,.xls,.csv"
-              onChange={handleImport}
-              style={{ display: 'none' }}
-            />
-          </label>
+          </button>
         </div>
         <div className="tab-row">
           <button className={tab === 'current' ? 'tab-active' : ''} onClick={() => setTab('current')}>Current Inventory</button>
@@ -505,6 +500,12 @@ const ClothingList: React.FC = () => {
             initial={editItem}
           />
         )}
+        {showImportModal && (
+          <ImportModal
+            onClose={() => setShowImportModal(false)}
+            onImport={handleImport}
+          />
+        )}
       </div>
     </div>
   );
@@ -597,6 +598,141 @@ const colorChart: { [key: number]: string } = {
   2: 'lime',
   15: 'peach',
   20: 'teal',
+};
+
+// Import Modal Component
+const ImportModal: React.FC<{
+  onClose: () => void;
+  onImport: (event: React.ChangeEvent<HTMLInputElement>) => void;
+}> = ({ onClose, onImport }) => {
+  return (
+    <div className="modal-bg">
+      <div className="modal-card glass" style={{ maxWidth: '600px', maxHeight: '80vh', overflow: 'auto' }}>
+        <button className="modal-close-btn" onClick={onClose} title="Close"><FaTimes /></button>
+        <h3>Import Clothing Items</h3>
+        
+        <div style={{ marginBottom: '20px' }}>
+          <h4 style={{ marginBottom: '10px', color: '#2563eb' }}>📋 Required Format</h4>
+          <p>Your spreadsheet must have these columns (first row should be headers):</p>
+          
+          <div style={{ 
+            background: '#f8fafc', 
+            padding: '15px', 
+            borderRadius: '8px', 
+            margin: '10px 0',
+            border: '1px solid #e2e8f0'
+          }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ borderBottom: '2px solid #cbd5e1' }}>
+                  <th style={{ padding: '8px', textAlign: 'left', fontWeight: 'bold' }}>Column</th>
+                  <th style={{ padding: '8px', textAlign: 'left', fontWeight: 'bold' }}>Required</th>
+                  <th style={{ padding: '8px', textAlign: 'left', fontWeight: 'bold' }}>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
+                  <td style={{ padding: '8px', fontWeight: 'bold' }}>SKU</td>
+                  <td style={{ padding: '8px', color: '#dc2626' }}>✓ Required</td>
+                  <td style={{ padding: '8px' }}>Unique identifier for the item</td>
+                </tr>
+                <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
+                  <td style={{ padding: '8px', fontWeight: 'bold' }}>Brand</td>
+                  <td style={{ padding: '8px', color: '#dc2626' }}>✓ Required</td>
+                  <td style={{ padding: '8px' }}>Brand name (e.g., Nike, Adidas)</td>
+                </tr>
+                <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
+                  <td style={{ padding: '8px', fontWeight: 'bold' }}>Size</td>
+                  <td style={{ padding: '8px', color: '#dc2626' }}>✓ Required</td>
+                  <td style={{ padding: '8px' }}>Size of the item (e.g., S, M, L, XL)</td>
+                </tr>
+                <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
+                  <td style={{ padding: '8px', fontWeight: 'bold' }}>Price</td>
+                  <td style={{ padding: '8px', color: '#dc2626' }}>✓ Required</td>
+                  <td style={{ padding: '8px' }}>Numeric price (must be positive)</td>
+                </tr>
+                <tr>
+                  <td style={{ padding: '8px', fontWeight: 'bold' }}>Color</td>
+                  <td style={{ padding: '8px', color: '#059669' }}>Optional</td>
+                  <td style={{ padding: '8px' }}>Color name (auto-generated if not provided)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div style={{ marginBottom: '20px' }}>
+          <h4 style={{ marginBottom: '10px', color: '#2563eb' }}>📄 Example Format</h4>
+          <div style={{ 
+            background: '#f8fafc', 
+            padding: '15px', 
+            borderRadius: '8px',
+            border: '1px solid #e2e8f0',
+            fontFamily: 'monospace',
+            fontSize: '14px'
+          }}>
+            <div>SKU | Brand | Size | Price | Color</div>
+            <div>ABC123 | Nike | M | 15.99 | Blue</div>
+            <div>DEF456 | Adidas | L | 12.50 | Red</div>
+            <div>GHI789 | Under Armour | S | 8.75 | Green</div>
+          </div>
+        </div>
+
+        <div style={{ marginBottom: '20px' }}>
+          <h4 style={{ marginBottom: '10px', color: '#2563eb' }}>🎨 Color Auto-Generation</h4>
+          <p>If you don't include a Color column, colors will be automatically assigned based on price:</p>
+          <div style={{ 
+            background: '#f8fafc', 
+            padding: '15px', 
+            borderRadius: '8px',
+            border: '1px solid #e2e8f0',
+            fontSize: '14px'
+          }}>
+            <div>$2 = Lime • $3 = Pink • $4 = Orange • $5 = Indigo</div>
+            <div>$6 = Green • $7 = Blue • $8 = Violet • $9 = Red</div>
+            <div>$10 = Yellow • $11 = Royal Blue • $12 = Light Blue</div>
+            <div>$15 = Peach • $20 = Teal • Other = Gray</div>
+          </div>
+        </div>
+
+        <div style={{ marginBottom: '20px' }}>
+          <h4 style={{ marginBottom: '10px', color: '#dc2626' }}>⚠️ Important Notes</h4>
+          <ul style={{ margin: '0', paddingLeft: '20px' }}>
+            <li>Supported file formats: .xlsx, .xls, .csv</li>
+            <li>First row must contain column headers</li>
+            <li>Prices must be numbers, not text</li>
+            <li>Items will be added to the current tab (Current/Sold Inventory)</li>
+            <li>Start with a small test file to verify the format</li>
+          </ul>
+        </div>
+
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          marginTop: '20px',
+          paddingTop: '20px',
+          borderTop: '1px solid #e2e8f0'
+        }}>
+          <button type="button" className="osu-btn osu-btn-gray" onClick={onClose}>
+            Cancel
+          </button>
+          <label className="osu-btn" style={{ cursor: 'pointer', margin: 0 }}>
+            Choose File & Import
+            <input
+              type="file"
+              accept=".xlsx,.xls,.csv"
+              onChange={(e) => {
+                onImport(e);
+                onClose();
+              }}
+              style={{ display: 'none' }}
+            />
+          </label>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default ClothingList;
