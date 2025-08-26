@@ -671,27 +671,10 @@ const ImportModal: React.FC<{
             fontFamily: 'monospace',
             fontSize: '14px'
           }}>
-            <div>SKU | Brand | Size | Price | Color</div>
-            <div>ABC123 | Nike | M | 15.99 | Blue</div>
-            <div>DEF456 | Adidas | L | 12.50 | Red</div>
-            <div>GHI789 | Under Armour | S | 8.75 | Green</div>
-          </div>
-        </div>
-
-        <div style={{ marginBottom: '20px' }}>
-          <h4 style={{ marginBottom: '10px', color: '#2563eb' }}>🎨 Color Auto-Generation</h4>
-          <p>If you don't include a Color column, colors will be automatically assigned based on price:</p>
-          <div style={{ 
-            background: '#f8fafc', 
-            padding: '15px', 
-            borderRadius: '8px',
-            border: '1px solid #e2e8f0',
-            fontSize: '14px'
-          }}>
-            <div>$2 = Lime • $3 = Pink • $4 = Orange • $5 = Indigo</div>
-            <div>$6 = Green • $7 = Blue • $8 = Violet • $9 = Red</div>
-            <div>$10 = Yellow • $11 = Royal Blue • $12 = Light Blue</div>
-            <div>$15 = Peach • $20 = Teal • Other = Gray</div>
+            <div>SKU    | Brand        | Size | Price | Color</div>
+            <div>ABC123 | Nike         | M    | 15.99 | Blue</div>
+            <div>DEF456 | Adidas       | L    | 12.50 | Red</div>
+            <div>GHI789 | Under Armour | S    | 8.75  | Green</div>
           </div>
         </div>
 
