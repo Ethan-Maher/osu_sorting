@@ -385,7 +385,13 @@ const ClothingList: React.FC = () => {
                       <button className="osu-btn osu-btn-sm osu-btn-icon osu-btn-gray" title="Remove" onClick={() => handleRemove(item.id, item.sku)}><FaTrash /></button>
                       <button className="osu-btn osu-btn-sm osu-btn-icon osu-btn-gray" title="Move Up" onClick={() => moveItem(idx, -1)} disabled={idx === 0}><FaArrowUp /></button>
                       <button className="osu-btn osu-btn-sm osu-btn-icon osu-btn-gray" title="Move Down" onClick={() => moveItem(idx, 1)} disabled={idx === filteredItems.length - 1}><FaArrowDown /></button>
-                      <button className="osu-btn osu-btn-sm osu-btn-icon osu-btn-gray" title="Move to Sold" onClick={() => handleMoveSold(item, true)}>Move to Sold</button>
+                      <button 
+                        className="osu-btn osu-btn-sm osu-btn-icon osu-btn-gray" 
+                        title={tab === 'current' ? "Move to Sold" : "Move to Current"} 
+                        onClick={() => handleMoveSold(item, tab === 'current' ? true : false)}
+                      >
+                        {tab === 'current' ? 'Move to Sold' : 'Move to Current'}
+                      </button>
                     </td>
                   </tr>
                 ))}
